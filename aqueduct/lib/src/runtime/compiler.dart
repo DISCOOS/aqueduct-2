@@ -50,7 +50,7 @@ class AqueductCompiler extends Compiler {
       final targetPubspecFile = File.fromUri(context.buildDirectoryUri.resolve("pubspec.yaml"));
       final pubspecContents = json.decode(targetPubspecFile.readAsStringSync());
       pubspecContents["dev_dependencies"]["aqueduct_test"]["path"] = "packages/aqueduct_test";
-      pubspecContents["dependency_overrides"]["aqueduct"] = pubspecContents["dependencies"]["aqueduct"];
+      pubspecContents["dependency_overrides"]["aqueduct_2"] = pubspecContents["dependencies"]["aqueduct_2"];
       targetPubspecFile.writeAsStringSync(json.encode(pubspecContents));
     }
   }

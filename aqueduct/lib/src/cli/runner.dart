@@ -28,7 +28,7 @@ class Runner extends CLICommand {
 
   @override
   String get name {
-    return "aqueduct";
+    return "aqueduct_2";
   }
 
   @override
