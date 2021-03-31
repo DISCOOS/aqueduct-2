@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  tearDownAll(Logger("aqueduct").clearListeners);
+  tearDownAll(Logger("aqueduct_2").clearListeners);
 
   group("Failures", () {
     test("Application start fails and logs appropriate message if request stream doesn't open", () async {

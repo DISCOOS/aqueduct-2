@@ -37,7 +37,7 @@ class CLIClient {
   static Future deactivateCLI() {
     final cmd = Platform.isWindows ? "pub.bat" : "pub";
 
-    return Process.run(cmd, ["global", "deactivate", "aqueduct"]);
+    return Process.run(cmd, ["global", "deactivate", "aqueduct_2"]);
   }
 
   Directory get defaultMigrationDirectory {
@@ -156,7 +156,7 @@ class TestChannel extends ApplicationChannel {
     args.insert(0, command);
     args.addAll(defaultArgs ?? []);
 
-    print("Running 'aqueduct ${args.join(" ")}'");
+    print("Running 'aqueduct_2 ${args.join(" ")}'");
     final saved = Directory.current;
     Directory.current = agent.workingDirectory;
 
@@ -178,7 +178,7 @@ class TestChannel extends ApplicationChannel {
     args.insert(0, command);
     args.addAll(defaultArgs ?? []);
 
-    print("Starting 'aqueduct ${args.join(" ")}'");
+    print("Starting 'aqueduct_2 ${args.join(" ")}'");
     final saved = Directory.current;
     Directory.current = agent.workingDirectory;
 

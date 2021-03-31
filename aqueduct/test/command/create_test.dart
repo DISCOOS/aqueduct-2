@@ -95,8 +95,8 @@ void main() {
           File.fromUri(cli.agent.workingDirectory.uri.resolve("test_project/").resolve(".packages"))
               .readAsStringSync()
               .split("\n")
-              .firstWhere((p) => p.startsWith("aqueduct:"))
-              .split("aqueduct:")
+              .firstWhere((p) => p.startsWith("aqueduct_2:"))
+              .split("aqueduct_2:")
               .last;
 
       var path = path_lib.normalize(path_lib.fromUri(aqueductLocationString));
@@ -117,7 +117,7 @@ void main() {
         var projectDir = Directory("templates/$template/");
         var pubspec = File.fromUri(projectDir.uri.resolve("pubspec.yaml"));
         var contents = loadYaml(pubspec.readAsStringSync());
-        final projectVersionConstraint = VersionConstraint.parse(contents["dependencies"]["aqueduct"] as String);
+        final projectVersionConstraint = VersionConstraint.parse(contents["dependencies"]["aqueduct_2"] as String);
         expect(projectVersionConstraint.allows(aqueductVersion), true);
       });
 

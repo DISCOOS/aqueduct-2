@@ -17,7 +17,7 @@ void main() {
 
   setUpAll(() async {
     cli = CLIClient(ProjectAgent("application_test", dependencies: {
-      "aqueduct": {"path": "../.."}
+      "aqueduct_2": {"path": "../.."}
     }))
       ..defaultArgs = ["--connect", "postgres://dart:dart@localhost:5432/dart_test"];
     await cli.agent.getDependencies();
