@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 
 import '../http/http.dart';
 import 'auth.dart';

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/http/resource_controller_interfaces.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/http/resource_controller_interfaces.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 import 'package:logging/logging.dart';
-import 'package:runtime/runtime.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 import 'http.dart';
 
@@ -57,8 +57,7 @@ abstract class Linkable {
 ///
 /// Subclasses must implement [handle] to respond to, modify or forward requests.
 /// This class must be subclassed. [Router] and [ResourceController] are common subclasses.
-abstract class Controller
-    implements APIComponentDocumenter, APIOperationDocumenter, Linkable {
+abstract class Controller implements APIComponentDocumenter, APIOperationDocumenter, Linkable {
   /// Returns a stacktrace and additional details about how the request's processing in the HTTP response.
   ///
   /// By default, this is false. During debugging, setting this to true can help debug Aqueduct applications
@@ -221,11 +220,10 @@ abstract class Controller
   /// Note: If [caughtValue]'s implements [HandlerException], this method is not called.
   ///
   /// If you override this method, it must not throw.
-  Future handleError(
-      Request request, dynamic caughtValue, StackTrace trace) async {
+  Future handleError(Request request, dynamic caughtValue, StackTrace trace) async {
     if (caughtValue is HTTPStreamingException) {
-      logger.severe("${request.toDebugString(includeHeaders: true)}",
-          caughtValue.underlyingException, caughtValue.trace);
+      logger.severe(
+          "${request.toDebugString(includeHeaders: true)}", caughtValue.underlyingException, caughtValue.trace);
 
       // ignore: unawaited_futures
       request.response.close().catchError((_) => null);
@@ -235,20 +233,14 @@ abstract class Controller
 
     try {
       final body = includeErrorDetailsInServerErrorResponses
-          ? {
-              "controller": "$runtimeType",
-              "error": "$caughtValue.",
-              "stacktrace": trace?.toString()
-            }
+          ? {"controller": "$runtimeType", "error": "$caughtValue.", "stacktrace": trace?.toString()}
           : null;
 
-      final response = Response.serverError(body: body)
-        ..contentType = ContentType.json;
+      final response = Response.serverError(body: body)..contentType = ContentType.json;
 
       await _sendResponse(request, response, includeCORSHeaders: true);
 
-      logger.severe(
-          "${request.toDebugString(includeHeaders: true)}", caughtValue, trace);
+      logger.severe("${request.toDebugString(includeHeaders: true)}", caughtValue, trace);
     } catch (e) {
       logger.severe("Failed to send response, draining request. Reason: $e");
       // ignore: unawaited_futures
@@ -269,12 +261,10 @@ abstract class Controller
   }
 
   @override
-  Map<String, APIPath> documentPaths(APIDocumentContext context) =>
-      nextController?.documentPaths(context);
+  Map<String, APIPath> documentPaths(APIDocumentContext context) => nextController?.documentPaths(context);
 
   @override
-  Map<String, APIOperation> documentOperations(
-      APIDocumentContext context, String route, APIPath path) {
+  Map<String, APIOperation> documentOperations(APIDocumentContext context, String route, APIPath path) {
     if (nextController == null) {
       return {};
     }
@@ -283,8 +273,7 @@ abstract class Controller
   }
 
   @override
-  void documentComponents(APIDocumentContext context) =>
-      nextController?.documentComponents(context);
+  void documentComponents(APIDocumentContext context) => nextController?.documentComponents(context);
 
   Future _handlePreflightRequest(Request req) async {
     Controller controllerToDictatePolicy;
@@ -317,8 +306,7 @@ abstract class Controller
     return controllerToDictatePolicy?.receive(req);
   }
 
-  Future _sendResponse(Request request, Response response,
-      {bool includeCORSHeaders = false}) {
+  Future _sendResponse(Request request, Response response, {bool includeCORSHeaders = false}) {
     if (includeCORSHeaders) {
       applyCORSHeadersIfNecessary(request, response);
     }
@@ -404,16 +392,13 @@ class _ControllerRecycler<T> extends Controller {
   }
 
   @override
-  void documentComponents(APIDocumentContext components) =>
-      nextInstanceToReceive.documentComponents(components);
+  void documentComponents(APIDocumentContext components) => nextInstanceToReceive.documentComponents(components);
 
   @override
-  Map<String, APIPath> documentPaths(APIDocumentContext components) =>
-      nextInstanceToReceive.documentPaths(components);
+  Map<String, APIPath> documentPaths(APIDocumentContext components) => nextInstanceToReceive.documentPaths(components);
 
   @override
-  Map<String, APIOperation> documentOperations(
-          APIDocumentContext components, String route, APIPath path) =>
+  Map<String, APIOperation> documentOperations(APIDocumentContext components, String route, APIPath path) =>
       nextInstanceToReceive.documentOperations(components, route, path);
 }
 
@@ -429,8 +414,7 @@ class _FunctionController extends Controller {
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
-      APIDocumentContext context, String route, APIPath path) {
+  Map<String, APIOperation> documentOperations(APIDocumentContext context, String route, APIPath path) {
     if (nextController == null) {
       return {};
     }

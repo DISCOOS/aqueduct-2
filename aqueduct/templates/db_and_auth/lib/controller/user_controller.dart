@@ -14,7 +14,7 @@ class UserController extends ResourceController {
     return Response.ok(users);
   }
 
-  @Operation.get("id")
+  @Operation.get('id')
   Future<Response> getUser(@Bind.path("id") int id) async {
     final query = Query<User>(context)..where((o) => o.id).equalTo(id);
     final u = await query.fetchOne();
@@ -30,8 +30,7 @@ class UserController extends ResourceController {
   }
 
   @Operation.put("id")
-  Future<Response> updateUser(
-      @Bind.path("id") int id, @Bind.body() User user) async {
+  Future<Response> updateUser(@Bind.path("id") int id, @Bind.body() User user) async {
     if (request.authorization.ownerID != id) {
       return Response.unauthorized();
     }
@@ -48,7 +47,7 @@ class UserController extends ResourceController {
     return Response.ok(u);
   }
 
-  @Operation.delete("id")
+  @Operation.delete('id')
   Future<Response> deleteUser(@Bind.path("id") int id) async {
     if (request.authorization.ownerID != id) {
       return Response.unauthorized();

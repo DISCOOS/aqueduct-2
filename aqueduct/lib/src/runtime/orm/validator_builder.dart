@@ -1,11 +1,11 @@
-import 'package:aqueduct/src/runtime/orm/entity_builder.dart';
-import 'package:aqueduct/src/runtime/orm/property_builder.dart';
-import 'package:aqueduct/src/db/managed/data_model.dart';
-import 'package:aqueduct/src/db/managed/entity.dart';
-import 'package:aqueduct/src/db/managed/relationship_type.dart';
-import 'package:aqueduct/src/db/managed/validation/managed.dart';
+import 'package:aqueduct_2/src/runtime/orm/entity_builder.dart';
+import 'package:aqueduct_2/src/runtime/orm/property_builder.dart';
+import 'package:aqueduct_2/src/db/managed/data_model.dart';
+import 'package:aqueduct_2/src/db/managed/entity.dart';
+import 'package:aqueduct_2/src/db/managed/relationship_type.dart';
+import 'package:aqueduct_2/src/db/managed/validation/managed.dart';
 
-import 'package:aqueduct/src/db/managed/validation/metadata.dart';
+import 'package:aqueduct_2/src/db/managed/validation/metadata.dart';
 
 class ValidatorBuilder {
   ValidatorBuilder(this.property, this.metadata);

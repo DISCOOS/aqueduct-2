@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/mixins/openapi_options.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
+import 'package:aqueduct_2/src/cli/mixins/openapi_options.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
 
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/scripts/openapi_builder.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/scripts/openapi_builder.dart';
 
 /// Used internally.
 class CLIDocumentClient extends CLICommand with CLIProject, CLIDocumentOptions {
@@ -18,11 +18,9 @@ class CLIDocumentClient extends CLICommand with CLIProject, CLIDocumentOptions {
     final file = File("client.html");
     file.writeAsStringSync(source);
 
-    displayInfo(
-        "OpenAPI client for application '${doc["info"]["title"]}' successfully created.",
+    displayInfo("OpenAPI client for application '${doc["info"]["title"]}' successfully created.",
         color: CLIColor.boldGreen);
-    displayProgress(
-        "Configured to connect to '${doc["servers"].first["url"]}'.");
+    displayProgress("Configured to connect to '${doc["servers"].first["url"]}'.");
     displayProgress("Open '${file.absolute.path}' in your browser.");
 
     return 0;

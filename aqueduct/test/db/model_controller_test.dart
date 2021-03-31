@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/db/query/matcher_internal.dart';
-import 'package:aqueduct/src/db/query/mixin.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/db/query/matcher_internal.dart';
+import 'package:aqueduct_2/src/db/query/mixin.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   Controller.letUncaughtExceptionsEscape = true;
@@ -36,36 +36,34 @@ void main() {
   });
 
   test("Request with no path parameters OK", () async {
-    var response = await http.get("http://localhost:8888/users");
+    var response = await http.get(Uri.parse('http://localhost:8888/users'));
     expect(response.statusCode, 200);
   });
 
   test("Request with path parameter of type needing parse OK", () async {
-    var response = await http.get("http://localhost:8888/users/1");
+    var response = await http.get(Uri.parse('http://localhost:8888/users/1'));
     expect(response.statusCode, 200);
   });
 
   test("Request with path parameter of wrong type returns 404", () async {
-    var response = await http.get("http://localhost:8888/users/foo");
+    var response = await http.get(Uri.parse('http://localhost:8888/users/foo'));
     expect(response.statusCode, 404);
   });
 
   test("Request with path parameter and body", () async {
-    var response = await http.put("http://localhost:8888/users/2",
-        headers: {"Content-Type": "application/json;charset=utf-8"},
-        body: json.encode({"name": "joe"}));
+    var response = await http.put(Uri.parse('http://localhost:8888/users/2'),
+        headers: {"Content-Type": "application/json;charset=utf-8"}, body: json.encode({"name": "joe"}));
     expect(response.statusCode, 200);
   });
 
   test("Request without path parameter and body", () async {
-    var response = await http.post("http://localhost:8888/users",
-        headers: {"Content-Type": "application/json;charset=utf-8"},
-        body: json.encode({"name": "joe"}));
+    var response = await http.post(Uri.parse('http://localhost:8888/users'),
+        headers: {"Content-Type": "application/json;charset=utf-8"}, body: json.encode({"name": "joe"}));
     expect(response.statusCode, 200);
   });
 
   test("Non-integer, oddly named identifier", () async {
-    var response = await http.get("http://localhost:8888/string/bar");
+    var response = await http.get(Uri.parse('http://localhost:8888/string/bar'));
     expect(response.body, '"bar"');
   });
 }
@@ -88,7 +86,7 @@ class TestModelController extends QueryController<TestModel> {
     return Response(statusCode, {}, null);
   }
 
-  @Operation.get("id")
+  @Operation.get('id')
   Future<Response> getOne(@Bind.path("id") int id) async {
     int statusCode = 200;
 
@@ -100,8 +98,7 @@ class TestModelController extends QueryController<TestModel> {
         .expressions
         .firstWhere((expr) => expr.keyPath.path.first.name == "id")
         .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
-        comparisonMatcher.value != id) {
+    if (comparisonMatcher.operator != PredicateOperator.equalTo || comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
@@ -130,8 +127,7 @@ class TestModelController extends QueryController<TestModel> {
         .expressions
         .firstWhere((expr) => expr.keyPath.path.first.name == "id")
         .expression as ComparisonExpression;
-    if (comparisonMatcher.operator != PredicateOperator.equalTo ||
-        comparisonMatcher.value != id) {
+    if (comparisonMatcher.operator != PredicateOperator.equalTo || comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
@@ -181,7 +177,7 @@ class _TestModel {
 class StringController extends QueryController<StringModel> {
   StringController(ManagedContext context) : super(context);
 
-  @Operation.get("id")
+  @Operation.get('id')
   Future<Response> get(@Bind.path("id") String id) async {
     final comparisonMatcher = (query as QueryMixin)
         .expressions

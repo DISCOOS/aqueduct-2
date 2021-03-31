@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 void main() {
   APIDocumentContext ctx;
@@ -38,16 +38,13 @@ void main() {
     expect(doc.properties["b"].properties["y"].type, APIType.string);
   });
 
-  test(
-      "If Serializable cannot be documented, it still allows doc generation but shows error in document",
-      () async {
+  test("If Serializable cannot be documented, it still allows doc generation but shows error in document", () async {
     final doc = FailsToDocument().documentSchema(ctx);
     await ctx.finalize();
 
     expect(doc.title, "FailsToDocument");
     expect(doc.description, contains("HttpServer"));
-    expect(doc.additionalPropertyPolicy,
-        APISchemaAdditionalPropertyPolicy.freeForm);
+    expect(doc.additionalPropertyPolicy, APISchemaAdditionalPropertyPolicy.freeForm);
   });
 
   test("Serializable can override static document method", () async {
@@ -108,8 +105,7 @@ class FailsToDocument extends Serializable {
 
 class OverrideDocument extends Serializable {
   @override
-  APISchemaObject documentSchema(
-      APIDocumentContext context) {
+  APISchemaObject documentSchema(APIDocumentContext context) {
     return APISchemaObject.object({"k": APISchemaObject.string()});
   }
 
@@ -119,7 +115,6 @@ class OverrideDocument extends Serializable {
   @override
   void readFromMap(Map<String, dynamic> requestBody) {}
 }
-
 
 class BoundBody extends Serializable {
   int x;

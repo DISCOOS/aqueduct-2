@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:aqueduct/src/cli/commands/oai_client.dart';
-import 'package:aqueduct/src/cli/mixins/openapi_options.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
+import 'package:aqueduct_2/src/cli/commands/oai_client.dart';
+import 'package:aqueduct_2/src/cli/mixins/openapi_options.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
 
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/commands/document_serve.dart';
-import 'package:aqueduct/src/cli/scripts/openapi_builder.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/commands/document_serve.dart';
+import 'package:aqueduct_2/src/cli/scripts/openapi_builder.dart';
 
 class CLIDocument extends CLICommand with CLIProject, CLIDocumentOptions {
   CLIDocument() {

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:runtime/runtime.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 Future main(List<String> args) async {
   final blacklist = [
@@ -21,16 +21,14 @@ Future main(List<String> args) async {
   if (args.length == 1) {
     testFiles = [File(args.first)];
   } else {
-    final testDir = args.isNotEmpty
-        ? Directory.current.uri.resolveUri(Uri.parse(args[0]))
-        : Directory.current.uri.resolve("test/");
+    final testDir =
+        args.isNotEmpty ? Directory.current.uri.resolveUri(Uri.parse(args[0])) : Directory.current.uri.resolve("test/");
 
     testFiles = Directory.fromUri(testDir)
         .listSync(recursive: true)
         .whereType<File>()
         .where((f) => f.path.endsWith("_test.dart"))
-        .where((f) => blacklist.every(
-            (blacklistFunction) => blacklistFunction(f.uri.path) == false))
+        .where((f) => blacklist.every((blacklistFunction) => blacklistFunction(f.uri.path) == false))
         .toList();
   }
   var remainingCounter = testFiles.length;
@@ -38,28 +36,21 @@ Future main(List<String> args) async {
   final failingFiles = <File>[];
   for (File f in testFiles) {
     final currentTime = DateTime.now();
-    final makePrompt = () =>
-        "(Pass: ${passingFiles.length} Fail: ${failingFiles.length} Remain: $remainingCounter)";
+    final makePrompt = () => "(Pass: ${passingFiles.length} Fail: ${failingFiles.length} Remain: $remainingCounter)";
     print("${makePrompt()} Loading test ${f.path}...");
 
-    final ctx = BuildContext(
-        Directory.current.uri.resolve("lib/").resolve("aqueduct.dart"),
-        Directory.current.uri.resolve("_build/"),
-        Directory.current.uri.resolve("run"),
-        f.readAsStringSync(),
+    final ctx = BuildContext(Directory.current.uri.resolve("lib/").resolve("aqueduct_2.dart"),
+        Directory.current.uri.resolve("_build/"), Directory.current.uri.resolve("run"), f.readAsStringSync(),
         forTests: true);
     final bm = BuildManager(ctx);
     await bm.build();
 
     print("${makePrompt()} Running tests derived from ${f.path}...");
     final result = await Process.start("dart", ["test/main_test.dart"],
-        workingDirectory:
-            ctx.buildDirectoryUri.toFilePath(windows: Platform.isWindows),
+        workingDirectory: ctx.buildDirectoryUri.toFilePath(windows: Platform.isWindows),
         environment: {
-          'AQUEDUCT_CI_DIR_LOCATION': Directory.current.uri
-              .resolve("../")
-              .resolve("ci/")
-              .toFilePath(windows: Platform.isWindows)
+          'AQUEDUCT_CI_DIR_LOCATION':
+              Directory.current.uri.resolve("../").resolve("ci/").toFilePath(windows: Platform.isWindows)
         });
     // ignore: unawaited_futures
     stdout.addStream(result.stdout);
@@ -75,8 +66,7 @@ Future main(List<String> args) async {
     }
 
     final elapsed = DateTime.now().difference(currentTime);
-    print(
-        "${makePrompt()} (${elapsed.inSeconds}s) Completed tests derived from ${f.path}.");
+    print("${makePrompt()} (${elapsed.inSeconds}s) Completed tests derived from ${f.path}.");
     await bm.clean();
     remainingCounter--;
   }

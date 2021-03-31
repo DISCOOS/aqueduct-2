@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -10,8 +10,7 @@ void main() {
     SocketProxy proxy;
 
     setUp(() async {
-      persistentStore = PostgreSQLPersistentStore(
-          "dart", "dart", "localhost", 5432, "dart_test");
+      persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
     });
 
     tearDown(() async {
@@ -33,20 +32,16 @@ void main() {
       ]);
     });
 
-    test(
-        "Ask for multiple connections at once, yield one successful connection",
-        () async {
-      var connections = await Future.wait([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-          .map((_) => persistentStore.getDatabaseConnection()));
+    test("Ask for multiple connections at once, yield one successful connection", () async {
+      var connections =
+          await Future.wait([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((_) => persistentStore.getDatabaseConnection()));
       var first = connections.first;
       expect(connections, everyElement(first));
     });
 
-    test("Make multiple requests at once, yield one successful connection",
-        () async {
+    test("Make multiple requests at once, yield one successful connection", () async {
       var expectedValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      var values = await Future.wait(
-          expectedValues.map((i) => persistentStore.execute("select $i")));
+      var values = await Future.wait(expectedValues.map((i) => persistentStore.execute("select $i")));
 
       expect(
           values,
@@ -57,33 +52,28 @@ void main() {
               .toList());
     });
 
-    test("Make multiple requests at once, all fail because db connect fails",
-        () async {
-      persistentStore = PostgreSQLPersistentStore(
-          "dart", "dart", "localhost", 5432, "xyzxyznotadb");
+    test("Make multiple requests at once, all fail because db connect fails", () async {
+      persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "xyzxyznotadb");
       var expectedValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      var values = await Future.wait(expectedValues.map(
-          (i) => persistentStore.execute("select $i").catchError((e) => e)));
+      var values =
+          await Future.wait(expectedValues.map((i) => persistentStore.execute("select $i").catchError((e) => e)));
       expect(values, everyElement(const TypeMatcher<QueryException>()));
     });
 
-    test(
-        "Make multiple requests at once, first few fails because db connect fails (but eventually succeeds)",
+    test("Make multiple requests at once, first few fails because db connect fails (but eventually succeeds)",
         () async {
-      persistentStore = PostgreSQLPersistentStore(
-          "dart", "dart", "localhost", 5433, "dart_test");
+      persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5433, "dart_test");
 
       var expectedValues = [1, 2, 3, 4, 5];
-      var values = await Future.wait(expectedValues.map(
-          (i) => persistentStore.execute("select $i").catchError((e) => e)));
+      var values =
+          await Future.wait(expectedValues.map((i) => persistentStore.execute("select $i").catchError((e) => e)));
       expect(values, everyElement(const TypeMatcher<QueryException>()));
 
       proxy = SocketProxy(5433, 5432);
       await proxy.open();
 
       expectedValues = [5, 6, 7, 8, 9];
-      values = await Future.wait(
-          expectedValues.map((i) => persistentStore.execute("select $i")));
+      values = await Future.wait(expectedValues.map((i) => persistentStore.execute("select $i")));
       expect(
           values,
           expectedValues
@@ -93,10 +83,8 @@ void main() {
               .toList());
     });
 
-    test("Connect to bad db fails gracefully, can then be used again",
-        () async {
-      persistentStore = PostgreSQLPersistentStore(
-          "dart", "dart", "localhost", 5433, "dart_test");
+    test("Connect to bad db fails gracefully, can then be used again", () async {
+      persistentStore = PostgreSQLPersistentStore("dart", "dart", "localhost", 5433, "dart_test");
 
       try {
         await persistentStore.executeQuery("SELECT 1", null, 20);
@@ -115,10 +103,8 @@ void main() {
   });
 
   group("Registration", () {
-    test("Create with default constructor registers and handles shutdown",
-        () async {
-      var store = PostgreSQLPersistentStore(
-          "dart", "dart", "localhost", 5432, "dart_test");
+    test("Create with default constructor registers and handles shutdown", () async {
+      var store = PostgreSQLPersistentStore("dart", "dart", "localhost", 5432, "dart_test");
 
       await store.execute("SELECT 1");
       expect(store.isConnected, true);

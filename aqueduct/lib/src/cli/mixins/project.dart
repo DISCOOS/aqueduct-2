@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/metadata.dart';
-import 'package:aqueduct/src/cli/scripts/get_channel_type.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/metadata.dart';
+import 'package:aqueduct_2/src/cli/scripts/get_channel_type.dart';
+import 'package:isolate_executor_2/isolate_executor_2.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 import 'package:path/path.dart' as path_lib;
 
 abstract class CLIProject implements CLICommand {
-  @Option("directory",
-      abbr: "d", help: "Project directory to execute command in")
+  @Option("directory", abbr: "d", help: "Project directory to execute command in")
   Directory get projectDirectory {
     if (_projectDirectory == null) {
       String dir = decode("directory");
@@ -28,19 +27,17 @@ abstract class CLIProject implements CLICommand {
     if (_pubspec == null) {
       final file = projectSpecificationFile;
       if (!file.existsSync()) {
-        throw CLIException(
-            "Failed to locate pubspec.yaml in project directory '${projectDirectory.path}'");
+        throw CLIException("Failed to locate pubspec.yaml in project directory '${projectDirectory.path}'");
       }
       var yamlContents = file.readAsStringSync();
-      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic> ;
+      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic>;
       _pubspec = yaml.cast<String, dynamic>();
     }
 
     return _pubspec;
   }
 
-  File get projectSpecificationFile =>
-      File.fromUri(projectDirectory.uri.resolve("pubspec.yaml"));
+  File get projectSpecificationFile => File.fromUri(projectDirectory.uri.resolve("pubspec.yaml"));
 
   Uri get packageConfigUri => projectDirectory.uri.resolve(".packages");
 
@@ -56,8 +53,7 @@ abstract class CLIProject implements CLICommand {
       }
 
       final lockFileContents = loadYaml(lockFile.readAsStringSync()) as Map;
-      final projectVersion =
-          lockFileContents["packages"]["aqueduct"]["version"] as String;
+      final projectVersion = lockFileContents["packages"]["aqueduct"]["version"] as String;
       _projectVersion = Version.parse(projectVersion);
     }
 
@@ -88,11 +84,9 @@ abstract class CLIProject implements CLICommand {
       }
 
       if (projectVersion?.major != toolVersion.major) {
-        throw CLIException(
-            "CLI version is incompatible with project aqueduct version.",
-            instructions: [
-              "Install aqueduct@${projectVersion?.toString()} or upgrade your project to aqueduct${toolVersion.toString()}."
-            ]);
+        throw CLIException("CLI version is incompatible with project aqueduct version.", instructions: [
+          "Install aqueduct@${projectVersion?.toString()} or upgrade your project to aqueduct${toolVersion.toString()}."
+        ]);
       }
     } on CLIException {
       rethrow;
@@ -101,15 +95,13 @@ abstract class CLIProject implements CLICommand {
 
   Future<String> getChannelName() async {
     final name = await IsolateExecutor.run(GetChannelExecutable({}),
-      packageConfigURI: packageConfigUri,
-      imports: GetChannelExecutable.importsForPackage(libraryName),
-      logHandler: displayProgress);
+        packageConfigURI: packageConfigUri,
+        imports: GetChannelExecutable.importsForPackage(libraryName),
+        logHandler: displayProgress);
     if (name == null) {
-      throw CLIException(
-        "No ApplicationChannel subclass found in $packageName/$libraryName");
+      throw CLIException("No ApplicationChannel subclass found in $packageName/$libraryName");
     }
 
     return name;
   }
-
 }

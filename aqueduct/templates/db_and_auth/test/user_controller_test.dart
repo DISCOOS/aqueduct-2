@@ -22,7 +22,7 @@ Future main() async {
   });
 
   test("Can get user with valid credentials", () async {
-    final response = await agents[0].get("/users/1");
+    final response = await agents[0].get('/users/1');
     expect(response, hasResponse(200, body: partial({"username": "bob+0@stablekernel.com"})));
   });
 

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   ManagedContext context;
@@ -144,8 +144,7 @@ void main() {
       expect(o.document.data, {"innerKey": "value"});
     });
 
-    test("Can subscript top-level array and return indexed primitive",
-        () async {
+    test("Can subscript top-level array and return indexed primitive", () async {
       // [1, 2],
       var q = Query<Obj>(context)
         ..where((o) => o.id).equalTo(4)

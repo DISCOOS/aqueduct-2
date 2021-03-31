@@ -1,10 +1,9 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
   test("Can override property in partial and modify attrs/validators", () {
-    var dataModel =
-        ManagedDataModel([OverriddenTotalModel, PartialReferenceModel]);
+    var dataModel = ManagedDataModel([OverriddenTotalModel, PartialReferenceModel]);
 
     var entity = dataModel.entityForType(OverriddenTotalModel);
     var field = entity.attributes["field"];
@@ -13,8 +12,7 @@ void main() {
   });
 }
 
-class OverriddenTotalModel extends ManagedObject<_OverriddenTotalModel>
-    implements _OverriddenTotalModel {}
+class OverriddenTotalModel extends ManagedObject<_OverriddenTotalModel> implements _OverriddenTotalModel {}
 
 class _OverriddenTotalModel extends PartialModel {
   @override
@@ -37,8 +35,7 @@ class PartialModel {
   }
 }
 
-class PartialReferenceModel extends ManagedObject<_PartialReferenceModel>
-    implements _PartialReferenceModel {}
+class PartialReferenceModel extends ManagedObject<_PartialReferenceModel> implements _PartialReferenceModel {}
 
 class _PartialReferenceModel {
   @primaryKey

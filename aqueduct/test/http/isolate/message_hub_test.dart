@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -14,9 +14,7 @@ void main() {
       await app?.stop();
     });
 
-    test(
-        "A message sent to the hub is received by other channels, but not by sender",
-        () async {
+    test("A message sent to the hub is received by other channels, but not by sender", () async {
       app = Application<HubChannel>()..options.port = 8000;
       await app.start(numberOfInstances: 3);
 
@@ -42,8 +40,7 @@ void main() {
           completes);
     });
 
-    test("A message sent in prepare is received by all channels eventually",
-        () async {
+    test("A message sent in prepare is received by all channels eventually", () async {
       app = Application<HubChannel>()
         ..options.port = 8000
         ..options.context = {"sendIn": "prepare"};
@@ -122,8 +119,7 @@ void main() {
       var errors = await getErrorsFromIsolates();
       var serverID = isolateIdentifierFromResponse(resp);
       expect(errors[serverID].length, 1);
-      expect(errors[serverID].first,
-          contains("Illegal argument in isolate message"));
+      expect(errors[serverID].first, contains("Illegal argument in isolate message"));
 
       // Make sure that we can still send messages from the isolate that encountered the error
       dynamic resendID;
@@ -145,25 +141,20 @@ void main() {
 }
 
 Future<http.Response> postMessage(String message) async {
-  return http.post("http://localhost:8000/send",
-      headers: {HttpHeaders.contentTypeHeader: ContentType.text.toString()},
-      body: message);
+  return http.post(Uri.parse('http://localhost:8000/send'),
+      headers: {HttpHeaders.contentTypeHeader: ContentType.text.toString()}, body: message);
 }
 
-Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages,
-    {int butNeverReceiveIn}) async {
-  final response = await http.get("http://localhost:8000/messages");
+Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages, {int butNeverReceiveIn}) async {
+  final response = await http.get(Uri.parse('http://localhost:8000/messages'));
   final respondingIsolateID = isolateIdentifierFromResponse(response);
   final messages = json.decode(response.body) as List<dynamic>;
 
   if (expectedMessages.containsKey(respondingIsolateID)) {
-    final remainingMessagesExpectedForIsolateID =
-        expectedMessages[respondingIsolateID];
+    final remainingMessagesExpectedForIsolateID = expectedMessages[respondingIsolateID];
     for (var message in messages) {
-      final firstMatchedMessage =
-          remainingMessagesExpectedForIsolateID.firstWhere((msg) {
-        return msg["isolateID"] == message["isolateID"] &&
-            msg["message"] == message["message"];
+      final firstMatchedMessage = remainingMessagesExpectedForIsolateID.firstWhere((msg) {
+        return msg["isolateID"] == message["isolateID"] && msg["message"] == message["message"];
       }, orElse: () => null);
 
       if (firstMatchedMessage != null) {
@@ -175,15 +166,12 @@ Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages,
     }
   }
 
-  if (butNeverReceiveIn != null &&
-      messages.isNotEmpty &&
-      respondingIsolateID == butNeverReceiveIn) {
+  if (butNeverReceiveIn != null && messages.isNotEmpty && respondingIsolateID == butNeverReceiveIn) {
     throw Exception("Received unexpected message from butNeverReceivedIn");
   }
 
   if (expectedMessages.isNotEmpty) {
-    return waitForMessages(expectedMessages,
-        butNeverReceiveIn: butNeverReceiveIn);
+    return waitForMessages(expectedMessages, butNeverReceiveIn: butNeverReceiveIn);
   }
 
   return null;
@@ -193,7 +181,7 @@ Future<Map<int, List<Map<String, dynamic>>>> getMessagesFromIsolates() async {
   var msgs = <int, List<Map<String, dynamic>>>{};
 
   while (msgs.length != 3) {
-    var resp = await http.get("http://localhost:8000/messages");
+    var resp = await http.get(Uri.parse('http://localhost:8000/messages'));
     var serverID = isolateIdentifierFromResponse(resp);
 
     if (!msgs.containsKey(serverID)) {
@@ -208,7 +196,7 @@ Future<Map<int, List<String>>> getErrorsFromIsolates() async {
   var msgs = <int, List<String>>{};
 
   while (msgs.length != 3) {
-    var resp = await http.get("http://localhost:8000/errors");
+    var resp = await http.get(Uri.parse('http://localhost:8000/errors'));
     var serverID = isolateIdentifierFromResponse(resp);
 
     if (!msgs.containsKey(serverID)) {

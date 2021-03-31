@@ -1,8 +1,7 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
-class InvalidModel extends ManagedObject<_InvalidModel>
-    implements _InvalidModel {}
+class InvalidModel extends ManagedObject<_InvalidModel> implements _InvalidModel {}
 
 class _InvalidModel {
   @primaryKey

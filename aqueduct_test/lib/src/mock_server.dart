@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 /// This class is used as a utility for testing.
 ///
@@ -111,8 +111,7 @@ class MockHTTPServer extends MockServer<Request> {
   /// response before sending it. Optionally includes a [delay] before sending
   /// the response to simulate long-running tasks or network issues.
   void queueResponse(Response resp, {Duration delay}) {
-    _responseQueue
-        .add(_MockServerResponse(object: resp, delay: delay ?? defaultDelay));
+    _responseQueue.add(_MockServerResponse(object: resp, delay: delay ?? defaultDelay));
   }
 
   /// Enqueues a function that creates a response for the next request.
@@ -123,8 +122,7 @@ class MockHTTPServer extends MockServer<Request> {
   ///
   /// Optionally includes a [delay] before sending the response to simulate long-running tasks or network issues.
   void queueHandler(Response handler(Request request), {Duration delay}) {
-    _responseQueue.add(
-        _MockServerResponse(handler: handler, delay: delay ?? defaultDelay));
+    _responseQueue.add(_MockServerResponse(handler: handler, delay: delay ?? defaultDelay));
   }
 
   /// Enqueues an outage; the next request will not receive a response.
@@ -189,8 +187,7 @@ class MockHTTPServer extends MockServer<Request> {
 typedef _MockRequestHandler = Response Function(Request request);
 
 class _MockServerResponse {
-  _MockServerResponse(
-      {this.object, this.handler, this.delay, this.outageCount = 0});
+  _MockServerResponse({this.object, this.handler, this.delay, this.outageCount = 0});
 
   final Duration delay;
 

@@ -1,8 +1,8 @@
-import 'package:aqueduct/src/db/managed/key_path.dart';
-import 'package:aqueduct/src/db/managed/managed.dart';
-import 'package:aqueduct/src/db/managed/relationship_type.dart';
-import 'package:aqueduct/src/db/postgresql/builders/table.dart';
-import 'package:aqueduct/src/db/query/matcher_internal.dart';
+import 'package:aqueduct_2/src/db/managed/key_path.dart';
+import 'package:aqueduct_2/src/db/managed/managed.dart';
+import 'package:aqueduct_2/src/db/managed/relationship_type.dart';
+import 'package:aqueduct_2/src/db/postgresql/builders/table.dart';
+import 'package:aqueduct_2/src/db/query/matcher_internal.dart';
 import 'package:postgres/postgres.dart';
 
 /// Common interface for values that can be mapped to/from a database.
@@ -18,8 +18,7 @@ class ColumnBuilder extends Returnable {
     int primaryKeyIndex;
     for (var i = 0; i < keys.length; i++) {
       final firstElement = keys[i].path.first;
-      if (firstElement is ManagedAttributeDescription &&
-          firstElement.isPrimaryKey) {
+      if (firstElement is ManagedAttributeDescription && firstElement.isPrimaryKey) {
         primaryKeyIndex = i;
         break;
       }
@@ -33,13 +32,11 @@ class ColumnBuilder extends Returnable {
     }
 
     return List.from(keys.map((key) {
-      return ColumnBuilder(table, propertyForName(entity, key.path.first.name),
-          documentKeyPath: key.dynamicElements);
+      return ColumnBuilder(table, propertyForName(entity, key.path.first.name), documentKeyPath: key.dynamicElements);
     }));
   }
 
-  static ManagedPropertyDescription propertyForName(
-      ManagedEntity entity, String propertyName) {
+  static ManagedPropertyDescription propertyForName(ManagedEntity entity, String propertyName) {
     var property = entity.properties[propertyName];
 
     if (property == null) {
@@ -47,8 +44,7 @@ class ColumnBuilder extends Returnable {
           "Could not construct query. Column '$propertyName' does not exist for table '${entity.tableName}'.");
     }
 
-    if (property is ManagedRelationshipDescription &&
-        property.relationshipType != ManagedRelationshipType.belongsTo) {
+    if (property is ManagedRelationshipDescription && property.relationshipType != ManagedRelationshipType.belongsTo) {
       throw ArgumentError(
           "Could not construct query. Column '$propertyName' does not exist for table '${entity.tableName}'. "
           "'$propertyName' recognized as ORM relationship, use 'Query.join' instead.");
@@ -96,8 +92,7 @@ class ColumnBuilder extends Returnable {
           return value;
         }
 
-        throw ArgumentError(
-            "Invalid data type for 'Document'. Must be 'Document', 'Map', or 'List'.");
+        throw ArgumentError("Invalid data type for 'Document'. Must be 'Document', 'Map', or 'List'.");
       }
     }
 
@@ -125,8 +120,7 @@ class ColumnBuilder extends Returnable {
   }
 
   String get sqlTypeSuffix {
-    var type =
-        PostgreSQLFormat.dataTypeStringForDataType(typeMap[property.type.kind]);
+    var type = PostgreSQLFormat.dataTypeStringForDataType(typeMap[property.type.kind]);
     if (type != null) {
       return ":$type";
     }
@@ -134,20 +128,14 @@ class ColumnBuilder extends Returnable {
     return "";
   }
 
-  String sqlColumnName(
-      {bool withTypeSuffix = false,
-      bool withTableNamespace = false,
-      String withPrefix}) {
+  String sqlColumnName({bool withTypeSuffix = false, bool withTableNamespace = false, String withPrefix}) {
     var name = property.name;
 
     if (property is ManagedRelationshipDescription) {
-      var relatedPrimaryKey = (property as ManagedRelationshipDescription)
-          .destinationEntity
-          .primaryKey;
+      var relatedPrimaryKey = (property as ManagedRelationshipDescription).destinationEntity.primaryKey;
       name = "${name}_$relatedPrimaryKey";
     } else if (documentKeyPath != null) {
-      final keys =
-          documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
+      final keys = documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
       name = "$name->$keys";
     }
 

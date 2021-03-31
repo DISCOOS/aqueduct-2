@@ -31,7 +31,7 @@ abstract class ResourceOwner {
 /// An [AuthServer] requires an instance of this type to manage storage of [ResourceOwner]s, [AuthToken], [AuthCode],
 /// and [AuthClient]s. You may also customize the token format or add more granular authorization scope rules.
 ///
-/// Prefer to use `ManagedAuthDelegate` from 'package:aqueduct/managed_auth.dart' instead of implementing this interface;
+/// Prefer to use `ManagedAuthDelegate` from 'package:aqueduct_2/managed_auth.dart' instead of implementing this interface;
 /// there are important details to consider and test when implementing this interface.
 abstract class AuthServerDelegate {
   /// Must return a [ResourceOwner] for a [username].
@@ -74,8 +74,7 @@ abstract class AuthServerDelegate {
   /// If no match is found, return null.
   ///
   /// [server] is the [AuthServer] requesting the [AuthToken].
-  FutureOr<AuthToken> getToken(AuthServer server,
-      {String byAccessToken, String byRefreshToken});
+  FutureOr<AuthToken> getToken(AuthServer server, {String byAccessToken, String byRefreshToken});
 
   /// This method must delete all [AuthToken] and [AuthCode]s for a [ResourceOwner].
   ///
@@ -111,8 +110,8 @@ abstract class AuthServerDelegate {
   ///
   /// You may alter the token in addition to the provided values, and you may override the provided values.
   /// [newAccessToken] defaults to a random 32 character string.
-  FutureOr updateToken(AuthServer server, String oldAccessToken,
-      String newAccessToken, DateTime newIssueDate, DateTime newExpirationDate);
+  FutureOr updateToken(AuthServer server, String oldAccessToken, String newAccessToken, DateTime newIssueDate,
+      DateTime newExpirationDate);
 
   /// Must store [code].
   ///

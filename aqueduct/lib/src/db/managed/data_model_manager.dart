@@ -1,6 +1,6 @@
-import 'package:aqueduct/src/db/managed/data_model.dart';
-import 'package:aqueduct/src/db/managed/entity.dart';
-import 'package:aqueduct/src/utilities/reference_counting_list.dart';
+import 'package:aqueduct_2/src/db/managed/data_model.dart';
+import 'package:aqueduct_2/src/db/managed/entity.dart';
+import 'package:aqueduct_2/src/utilities/reference_counting_list.dart';
 
 class ManagedDataModelManager {
   static ReferenceCountingList<ManagedDataModel> dataModels =

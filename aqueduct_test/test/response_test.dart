@@ -1,5 +1,5 @@
 import 'package:matcher/matcher.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:aqueduct_test/aqueduct_test.dart';
 import 'package:aqueduct_test/src/body_matcher.dart';
 import 'package:aqueduct_test/src/response_matcher.dart';
@@ -18,15 +18,13 @@ void main() {
     await server.close();
   });
 
-  test("Mismatched body shows decoded body and teh reason for the mismatch",
-      () async {
+  test("Mismatched body shows decoded body and teh reason for the mismatch", () async {
     server.queueHandler((req) {
       return Response.ok({"key": "value"});
     });
 
-    final response = await agent.get("/");
-    final responseMatcher = HTTPResponseMatcher(
-        200, null, HTTPBodyMatcher(equals({"notkey": "bar"})));
+    final response = await agent.get('/');
+    final responseMatcher = HTTPResponseMatcher(200, null, HTTPBodyMatcher(equals({"notkey": "bar"})));
     expect(responseMatcher.matches(response, {}), false);
 
     final desc = StringDescription();

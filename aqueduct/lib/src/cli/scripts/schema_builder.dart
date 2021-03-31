@@ -1,22 +1,18 @@
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/cli/migration_source.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/cli/migration_source.dart';
+import 'package:isolate_executor_2/isolate_executor_2.dart';
 
 class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   SchemaBuilderExecutable(Map<String, dynamic> message)
       : inputSchema = Schema.fromMap(message["schema"] as Map<String, dynamic>),
-        sources = (message["sources"] as List<Map>)
-            .map((m) => MigrationSource.fromMap(m as Map<String, dynamic>))
-            .toList(),
+        sources =
+            (message["sources"] as List<Map>).map((m) => MigrationSource.fromMap(m as Map<String, dynamic>)).toList(),
         super(message);
 
   SchemaBuilderExecutable.input(this.sources, this.inputSchema)
-      : super({
-          "schema": inputSchema.asMap(),
-          "sources": sources.map((source) => source.asMap()).toList()
-        });
+      : super({"schema": inputSchema.asMap(), "sources": sources.map((source) => source.asMap()).toList()});
 
   final List<MigrationSource> sources;
   final Schema inputSchema;
@@ -25,8 +21,7 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   Future<Map<String, dynamic>> execute() async {
     hierarchicalLoggingEnabled = true;
     PostgreSQLPersistentStore.logger.level = Level.ALL;
-    PostgreSQLPersistentStore.logger.onRecord
-        .listen((r) => log("${r.message}"));
+    PostgreSQLPersistentStore.logger.onRecord.listen((r) => log("${r.message}"));
     try {
       var outputSchema = inputSchema;
       for (var source in sources) {
@@ -50,8 +45,8 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   }
 
   static List<String> get imports => [
-        "package:aqueduct/aqueduct.dart",
-        "package:aqueduct/src/cli/migration_source.dart",
-        "package:runtime/runtime.dart"
+        "package:aqueduct_2/aqueduct_2.dart",
+        "package:aqueduct_2/src/cli/migration_source.dart",
+        "package:runtime_2/runtime_2.dart"
       ];
 }

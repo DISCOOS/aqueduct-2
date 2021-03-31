@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   var defaultSize = RequestBody.maxSize;
@@ -24,11 +24,10 @@ void main() {
 
     test("Stream a list of bytes as a response", () async {
       var sc = StreamController<List<int>>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("application", "octet-stream");
+      var response = Response.ok(sc.stream)..contentType = ContentType("application", "octet-stream");
       server = await bindAndRespondWith(response);
 
-      var resultFuture = http.get("http://localhost:8888");
+      var resultFuture = http.get(Uri.parse('http://localhost:8888'));
 
       sc.add([1, 2, 3, 4]);
       sc.add([5, 6, 7, 8]);
@@ -42,11 +41,10 @@ void main() {
 
     test("Stream of list of bytes encounters error", () async {
       var sc = StreamController<List<int>>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("application", "octet-stream");
+      var response = Response.ok(sc.stream)..contentType = ContentType("application", "octet-stream");
       server = await bindAndRespondWith(response);
 
-      final request = await HttpClient().get("localhost", 8888, "/");
+      final request = await HttpClient().get('localhost', 8888, '/');
       final resultFuture = request.close();
 
       sc.add([1, 2, 3, 4]);
@@ -60,24 +58,20 @@ void main() {
         await resp.toList();
         expect(true, false);
       } on HttpException catch (e) {
-        expect(
-            e.toString(), contains("Connection closed while receiving data"));
+        expect(e.toString(), contains("Connection closed while receiving data"));
       }
 
       expect(serverHasNoMoreConnections(server), completes);
     });
 
-    test("Stream a list of bytes with incorrect content type returns 500",
-        () async {
-      CodecRegistry.defaultInstance
-          .add(ContentType("application", "silly"), const Utf8Codec());
+    test("Stream a list of bytes with incorrect content type returns 500", () async {
+      CodecRegistry.defaultInstance.add(ContentType("application", "silly"), const Utf8Codec());
 
       var sc = StreamController<List<int>>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("application", "silly");
+      var response = Response.ok(sc.stream)..contentType = ContentType("application", "silly");
       server = await bindAndRespondWith(response);
 
-      var resultFuture = http.get("http://localhost:8888");
+      var resultFuture = http.get(Uri.parse('http://localhost:8888'));
 
       sc.add([1, 2, 3, 4]);
       sc.add([5, 6, 7, 8]);
@@ -103,11 +97,10 @@ void main() {
 
     test("Stream a string as a response (which uses a codec)", () async {
       var sc = StreamController<String>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("text", "plain", charset: "utf-8");
+      var response = Response.ok(sc.stream)..contentType = ContentType("text", "plain", charset: "utf-8");
       server = await bindAndRespondWith(response);
 
-      var resultFuture = http.get("http://localhost:8888");
+      var resultFuture = http.get(Uri.parse('http://localhost:8888'));
 
       sc.add("abcd");
       sc.add("efgh");
@@ -120,15 +113,13 @@ void main() {
     });
 
     test("Crash in encoder terminates connection", () async {
-      CodecRegistry.defaultInstance
-          .add(ContentType("application", "crash"), CrashingCodec());
+      CodecRegistry.defaultInstance.add(ContentType("application", "crash"), CrashingCodec());
 
       var sc = StreamController<String>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("application", "crash");
+      var response = Response.ok(sc.stream)..contentType = ContentType("application", "crash");
       server = await bindAndRespondWith(response);
 
-      final request = await HttpClient().get("localhost", 8888, "/");
+      final request = await HttpClient().get('localhost', 8888, '/');
       final resultFuture = request.close();
 
       sc.add("abcd");
@@ -141,8 +132,7 @@ void main() {
         await resp.toList();
         expect(true, false);
       } on HttpException catch (e) {
-        expect(
-            e.toString(), contains("Connection closed while receiving data"));
+        expect(e.toString(), contains("Connection closed while receiving data"));
       }
 
       expect(serverHasNoMoreConnections(server), completes);
@@ -162,12 +152,9 @@ void main() {
       client.close(force: true);
     });
 
-    test(
-        "Content-Type that can be gzipped but request does not have Accept-Encoding not gzipped",
-        () async {
+    test("Content-Type that can be gzipped but request does not have Accept-Encoding not gzipped", () async {
       var sc = StreamController<String>();
-      server = await bindAndRespondWith(
-          Response.ok(sc.stream)..contentType = ContentType.text);
+      server = await bindAndRespondWith(Response.ok(sc.stream)..contentType = ContentType.text);
 
       var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
@@ -181,8 +168,7 @@ void main() {
 
       var resp = await respFuture;
 
-      expect(resp.headers.contentType.toString(),
-          equals(ContentType.text.toString()));
+      expect(resp.headers.contentType.toString(), equals(ContentType.text.toString()));
       expect(resp.headers.value("content-encoding"), isNull);
       expect(resp.headers.value("transfer-encoding"), "chunked");
       expect(resp.headers.value("content-length"), isNull);
@@ -192,12 +178,9 @@ void main() {
       expect(utf8.decode(allBody), "abcdefgh");
     });
 
-    test(
-        "Content-Type that can be gzipped and request has Accept-Encoding but not gzip doesn't get gzipped",
-        () async {
+    test("Content-Type that can be gzipped and request has Accept-Encoding but not gzip doesn't get gzipped", () async {
       var sc = StreamController<String>();
-      server = await bindAndRespondWith(
-          Response.ok(sc.stream)..contentType = ContentType.text);
+      server = await bindAndRespondWith(Response.ok(sc.stream)..contentType = ContentType.text);
 
       var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
@@ -211,8 +194,7 @@ void main() {
 
       var resp = await respFuture;
 
-      expect(resp.headers.contentType.toString(),
-          equals(ContentType.text.toString()));
+      expect(resp.headers.contentType.toString(), equals(ContentType.text.toString()));
       expect(resp.headers.value("content-encoding"), isNull);
       expect(resp.headers.value("transfer-encoding"), "chunked");
       expect(resp.headers.value("content-length"), isNull);
@@ -222,12 +204,10 @@ void main() {
       expect(utf8.decode(allBody), "abcdefgh");
     });
 
-    test("Unregistered content-type of Stream<List<int>> does not get gzipped",
-        () async {
+    test("Unregistered content-type of Stream<List<int>> does not get gzipped", () async {
       var sc = StreamController<List<int>>();
       var ct = ContentType("application", "1");
-      server =
-          await bindAndRespondWith(Response.ok(sc.stream)..contentType = ct);
+      server = await bindAndRespondWith(Response.ok(sc.stream)..contentType = ct);
       var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "gzip");
@@ -246,15 +226,11 @@ void main() {
       expect(await resp.first, [1, 2, 3, 4]);
     });
 
-    test(
-        "Content-type that can't be gzipped and Accept-Encoding accepts gzip, not gzipped",
-        () async {
+    test("Content-type that can't be gzipped and Accept-Encoding accepts gzip, not gzipped", () async {
       var sc = StreamController<String>();
       var ct = ContentType("application", "3");
-      CodecRegistry.defaultInstance
-          .add(ct, const Utf8Codec(), allowCompression: false);
-      server =
-          await bindAndRespondWith(Response.ok(sc.stream)..contentType = ct);
+      CodecRegistry.defaultInstance.add(ct, const Utf8Codec(), allowCompression: false);
+      server = await bindAndRespondWith(Response.ok(sc.stream)..contentType = ct);
       var req = await client.getUrl(Uri.parse("http://localhost:8888"));
       req.headers.clear();
       req.headers.add("accept-encoding", "gzip");
@@ -281,11 +257,9 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Client request is cancelled during stream cleans up appropriately",
-        () async {
+    test("Client request is cancelled during stream cleans up appropriately", () async {
       var sc = StreamController<List<int>>();
-      var response = Response.ok(sc.stream)
-        ..contentType = ContentType("application", "octet-stream");
+      var response = Response.ok(sc.stream)..contentType = ContentType("application", "octet-stream");
       var initiateResponseCompleter = Completer();
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
       server.map((req) => Request(req)).listen((req) async {
@@ -298,8 +272,7 @@ void main() {
       });
 
       var socket = await Socket.connect("localhost", 8888);
-      var request =
-          "GET /r HTTP/1.1\r\nConnection: keep-alive\r\nHost: localhost\r\n\r\n";
+      var request = "GET /r HTTP/1.1\r\nConnection: keep-alive\r\nHost: localhost\r\n\r\n";
       socket.add(request.codeUnits);
 
       await initiateResponseCompleter.future;
@@ -344,9 +317,7 @@ void main() {
       get back the response.
      */
 
-    test(
-        "Entity with known content-type that is too large is rejected, chunked",
-        () async {
+    test("Entity with known content-type that is too large is rejected, chunked", () async {
       Controller.letUncaughtExceptionsEscape = true;
       RequestBody.maxSize = 8193;
 
@@ -360,8 +331,7 @@ void main() {
       });
 
       var req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers.add(
-          HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
+      req.headers.add(HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
       var body = {"key": List.generate(8192 * 50, (_) => "a").join(" ")};
       req.add(utf8.encode(json.encode(body)));
 
@@ -382,32 +352,27 @@ void main() {
 
       // Make sure we can still send some more requests;
       req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers.add(
-          HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
+      req.headers.add(HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
       body = {"key": "a"};
       req.add(utf8.encode(json.encode(body)));
       var response = await req.close();
       expect(json.decode(utf8.decode(await response.first)), {"key": "a"});
     });
 
-    test(
-        "Entity with unknown content-type that is too large is rejected, chunked",
-        () async {
+    test("Entity with unknown content-type that is too large is rejected, chunked", () async {
       RequestBody.maxSize = 8193;
 
       var controller = PassthruController()
         ..linkFunction((req) async {
           var body = await req.body.decode();
-          return Response.ok(body)
-            ..contentType = ContentType("application", "octet-stream");
+          return Response.ok(body)..contentType = ContentType("application", "octet-stream");
         });
       server.listen((req) {
         controller.receive(Request(req));
       });
 
       var req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers
-          .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
+      req.headers.add(HttpHeaders.contentTypeHeader, "application/octet-stream");
       req.add(List.generate(8192 * 100, (_) => 1));
 
       try {
@@ -427,8 +392,7 @@ void main() {
 
       // Make sure we can still send some more requests;
       req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers
-          .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
+      req.headers.add(HttpHeaders.contentTypeHeader, "application/octet-stream");
       req.add([1, 2, 3, 4]);
       var response = await req.close();
       expect(await response.toList(), [

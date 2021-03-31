@@ -1,13 +1,11 @@
-import 'package:aqueduct/src/db/managed/managed.dart';
-import 'package:aqueduct/src/db/postgresql/builders/column.dart';
-import 'package:aqueduct/src/db/postgresql/builders/table.dart';
-import 'package:aqueduct/src/db/query/matcher_internal.dart';
-import 'package:aqueduct/src/db/query/query.dart';
+import 'package:aqueduct_2/src/db/managed/managed.dart';
+import 'package:aqueduct_2/src/db/postgresql/builders/column.dart';
+import 'package:aqueduct_2/src/db/postgresql/builders/table.dart';
+import 'package:aqueduct_2/src/db/query/matcher_internal.dart';
+import 'package:aqueduct_2/src/db/query/query.dart';
 
 class ColumnExpressionBuilder extends ColumnBuilder {
-  ColumnExpressionBuilder(
-      TableBuilder table, ManagedPropertyDescription property, this.expression,
-      {this.prefix = ""})
+  ColumnExpressionBuilder(TableBuilder table, ManagedPropertyDescription property, this.expression, {this.prefix = ""})
       : super(table, property);
 
   final String prefix;
@@ -36,18 +34,15 @@ class ColumnExpressionBuilder extends ColumnBuilder {
         "Unknown expression applied to 'Query'. '${expr.runtimeType}' is not supported by 'PostgreSQL'.");
   }
 
-  QueryPredicate comparisonPredicate(
-      PredicateOperator operator, dynamic value) {
+  QueryPredicate comparisonPredicate(PredicateOperator operator, dynamic value) {
     final name = sqlColumnName(withTableNamespace: true);
     final variableName = sqlColumnName(withPrefix: defaultPrefix);
 
-    return QueryPredicate(
-        "$name ${ColumnBuilder.symbolTable[operator]} @$variableName$sqlTypeSuffix",
+    return QueryPredicate("$name ${ColumnBuilder.symbolTable[operator]} @$variableName$sqlTypeSuffix",
         {variableName: convertValueForStorage(value)});
   }
 
-  QueryPredicate containsPredicate(Iterable<dynamic> values,
-      {bool within = true}) {
+  QueryPredicate containsPredicate(Iterable<dynamic> values, {bool within = true}) {
     var tokenList = [];
     var pairedMap = <String, dynamic>{};
 
@@ -72,25 +67,18 @@ class ColumnExpressionBuilder extends ColumnBuilder {
     return QueryPredicate("$name ${isNull ? "ISNULL" : "NOTNULL"}", {});
   }
 
-  QueryPredicate rangePredicate(dynamic lhsValue, dynamic rhsValue,
-      {bool insideRange = true}) {
+  QueryPredicate rangePredicate(dynamic lhsValue, dynamic rhsValue, {bool insideRange = true}) {
     final name = sqlColumnName(withTableNamespace: true);
     final lhsName = sqlColumnName(withPrefix: "${defaultPrefix}lhs_");
     final rhsName = sqlColumnName(withPrefix: "${defaultPrefix}rhs_");
     final operation = insideRange ? "BETWEEN" : "NOT BETWEEN";
 
-    return QueryPredicate(
-        "$name $operation @$lhsName$sqlTypeSuffix AND @$rhsName$sqlTypeSuffix",
-        {
-          lhsName: convertValueForStorage(lhsValue),
-          rhsName: convertValueForStorage(rhsValue)
-        });
+    return QueryPredicate("$name $operation @$lhsName$sqlTypeSuffix AND @$rhsName$sqlTypeSuffix",
+        {lhsName: convertValueForStorage(lhsValue), rhsName: convertValueForStorage(rhsValue)});
   }
 
   QueryPredicate stringPredicate(PredicateStringOperator operator, String value,
-      {bool caseSensitive = true,
-      bool invertOperator = false,
-      bool allowSpecialCharacters = true}) {
+      {bool caseSensitive = true, bool invertOperator = false, bool allowSpecialCharacters = true}) {
     final n = sqlColumnName(withTableNamespace: true);
     final variableName = sqlColumnName(withPrefix: defaultPrefix);
 
@@ -114,8 +102,7 @@ class ColumnExpressionBuilder extends ColumnBuilder {
         break;
     }
 
-    return QueryPredicate("$n $operation @$variableName$sqlTypeSuffix",
-        {variableName: matchValue});
+    return QueryPredicate("$n $operation @$variableName$sqlTypeSuffix", {variableName: matchValue});
   }
 
   String escapeLikeString(String input) {

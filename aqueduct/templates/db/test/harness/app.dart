@@ -4,7 +4,7 @@ import 'package:aqueduct_test/aqueduct_test.dart';
 export 'package:wildfire/wildfire.dart';
 export 'package:aqueduct_test/aqueduct_test.dart';
 export 'package:test/test.dart';
-export 'package:aqueduct/aqueduct.dart';
+export 'package:aqueduct_2/aqueduct_2.dart';
 
 /// A testing harness for wildfire.
 ///
@@ -14,7 +14,7 @@ export 'package:aqueduct/aqueduct.dart';
 ///           Harness harness = Harness()..install();
 ///
 ///           test("GET /path returns 200", () async {
-///             final response = await harness.agent.get("/path");
+///             final response = await harness.agent.get(Uri.parse('/path'));
 ///             expectResponse(response, 200);
 ///           });
 ///         }
@@ -29,9 +29,7 @@ class Harness extends TestHarness<WildfireChannel> with TestHarnessORMMixin {
   }
 
   @override
-  Future onTearDown() async {
-
-  }
+  Future onTearDown() async {}
 
   @override
   Future seed() async {

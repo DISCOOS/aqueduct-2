@@ -5,8 +5,8 @@
 /// Example:
 ///
 /// import 'package:test/test.dart';
-/// import 'package:aqueduct/aqueduct.dart';
-/// import 'package:aqueduct/test.dart';
+/// import 'package:aqueduct_2/aqueduct_2.dart';
+/// import 'package:aqueduct_2/test.dart';
 ///
 /// void main() {
 ///   test("...", () async => ...);

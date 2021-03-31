@@ -2,14 +2,14 @@
 
 ## Running the Application Locally
 
-Run `aqueduct serve` from this directory to run the application. For running within an IDE, run `bin/main.dart`. By default, a configuration file named `config.yaml` will be used.
+Run `aqueduct_2 serve` from this directory to run the application. For running within an IDE, run `bin/main.dart`. By default, a configuration file named `config.yaml` will be used.
 
 You must have a `config.yaml` file that has correct database connection info, which should point to a local database. To configure a database to match your application's schema, run the following commands:
 
 ```
 # if this is a new project, run db generate first
-aqueduct db generate
-aqueduct db upgrade --connect postgres://user:password@localhost:5432/app_name
+aqueduct_2 db generate
+aqueduct_2 db upgrade --connect postgres://user:password@localhost:5432/app_name
 ```
 
 To generate a SwaggerUI client, run `aqueduct document client`.
@@ -34,4 +34,4 @@ The default configuration file used when testing is `config.src.yaml`. This file
 
 ## Deploying an Application
 
-See the documentation for [Deployment](https://aqueduct.io/docs/deploy/).
+See the documentation for [Deployment](https://discoos.github.io/aqueduct-2/docs/deploy/).

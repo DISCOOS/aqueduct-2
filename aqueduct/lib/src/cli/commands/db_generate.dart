@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/metadata.dart';
-import 'package:aqueduct/src/cli/mixins/database_managing.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:aqueduct/src/cli/scripts/migration_builder.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/metadata.dart';
+import 'package:aqueduct_2/src/cli/mixins/database_managing.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
+import 'package:aqueduct_2/src/cli/scripts/migration_builder.dart';
 
-class CLIDatabaseGenerate extends CLICommand
-    with CLIDatabaseManagingCommand, CLIProject {
-  @Option("name",
-      help:
-          "Name of the generated migration. Automaticaly lower- and snakecased.",
-      defaultsTo: "unnamed")
+class CLIDatabaseGenerate extends CLICommand with CLIDatabaseManagingCommand, CLIProject {
+  @Option("name", help: "Name of the generated migration. Automaticaly lower- and snakecased.", defaultsTo: "unnamed")
   String get migrationName {
     final String name = decode("name");
 
@@ -28,9 +24,7 @@ class CLIDatabaseGenerate extends CLICommand
 
     for (int i = 0; i < name.length; i++) {
       final char = String.fromCharCode(name.codeUnitAt(i));
-      final nextChar = i + 1 == name.length
-          ? null
-          : String.fromCharCode(name.codeUnitAt(i + 1));
+      final nextChar = i + 1 == name.length ? null : String.fromCharCode(name.codeUnitAt(i + 1));
 
       if (symbolRegex.hasMatch(char)) {
         continue;
@@ -38,9 +32,8 @@ class CLIDatabaseGenerate extends CLICommand
 
       sb.write(char);
 
-      final isEndOfWord = nextChar == null ||
-          (upperAlphaRegex.hasMatch(nextChar) && !isAllCaps) ||
-          symbolRegex.hasMatch(nextChar);
+      final isEndOfWord =
+          nextChar == null || (upperAlphaRegex.hasMatch(nextChar) && !isAllCaps) || symbolRegex.hasMatch(nextChar);
 
       if (isEndOfWord) {
         words.add(sb.toString().toLowerCase());
@@ -55,19 +48,18 @@ class CLIDatabaseGenerate extends CLICommand
   Future<int> handle() async {
     var existingMigrations = projectMigrations;
 
-    var newMigrationFile = File.fromUri(migrationDirectory.uri.resolve(
-        "00000001_${migrationName != "unnamed" ? migrationName : "initial"}.migration.dart"));
+    var newMigrationFile = File.fromUri(migrationDirectory.uri
+        .resolve("00000001_${migrationName != "unnamed" ? migrationName : "initial"}.migration.dart"));
     var versionNumber = 1;
 
     if (existingMigrations.isNotEmpty) {
       versionNumber = existingMigrations.last.versionNumber + 1;
-      newMigrationFile = File.fromUri(migrationDirectory.uri.resolve(
-          "${"$versionNumber".padLeft(8, "0")}_${migrationName}.migration.dart"));
+      newMigrationFile = File.fromUri(
+          migrationDirectory.uri.resolve("${"$versionNumber".padLeft(8, "0")}_${migrationName}.migration.dart"));
     }
 
     final schema = await schemaByApplyingMigrationSources(projectMigrations);
-    final result =
-        await generateMigrationFileForProject(this, schema, versionNumber);
+    final result = await generateMigrationFileForProject(this, schema, versionNumber);
 
     displayInfo("The following ManagedObject<T> subclasses were found:");
     displayProgress("${result.tablesEvaluated.join(", ")}");
@@ -80,8 +72,7 @@ class CLIDatabaseGenerate extends CLICommand
 
     newMigrationFile.writeAsStringSync(result.source);
 
-    displayInfo("Created new migration file (version $versionNumber).",
-        color: CLIColor.boldGreen);
+    displayInfo("Created new migration file (version $versionNumber).", color: CLIColor.boldGreen);
     displayProgress("New file is located at ${newMigrationFile.path}");
 
     return 0;

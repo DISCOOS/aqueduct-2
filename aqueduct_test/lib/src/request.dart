@@ -10,7 +10,7 @@ part of aqueduct_test.client;
 class TestRequest {
   TestRequest._(this._client);
 
-  HttpClient _client;
+  final HttpClient _client;
   Uri _baseUrl;
 
   /// The base URL of the request.
@@ -112,8 +112,7 @@ class TestRequest {
 
   /// Sets the Accept header of this request.
   set accept(List<ContentType> contentTypes) {
-    headers[HttpHeaders.acceptHeader] =
-        contentTypes.map((ct) => ct.toString()).join(",");
+    headers[HttpHeaders.acceptHeader] = contentTypes.map((ct) => ct.toString()).join(",");
   }
 
   /// Executes this request with HTTP POST.
@@ -160,10 +159,8 @@ class TestRequest {
     final uri = Uri.parse(requestURL);
     final lowercasedMethod = method.toLowerCase();
 
-    if (body != null &&
-        (lowercasedMethod == "get" || lowercasedMethod == "head")) {
-      throw StateError(
-          "Cannot set 'body' when using HTTP '${method.toUpperCase()}'.");
+    if (body != null && (lowercasedMethod == "get" || lowercasedMethod == "head")) {
+      throw StateError("Cannot set 'body' when using HTTP '${method.toUpperCase()}'.");
     }
 
     final request = await _client.openUrl(method.toUpperCase(), uri);
@@ -197,8 +194,7 @@ class TestRequest {
       return body as List<int>;
     }
 
-    final codec =
-        CodecRegistry.defaultInstance.codecForContentType(contentType);
+    final codec = CodecRegistry.defaultInstance.codecForContentType(contentType);
 
     if (codec == null) {
       // this check doesn't truly work, but if its a list, it's probably a list of bytes.

@@ -1,8 +1,8 @@
 import 'dart:async';
 import "dart:core";
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:runtime_2/runtime_2.dart';
 import "package:test/test.dart";
 
 void main() {

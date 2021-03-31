@@ -3,11 +3,11 @@ import 'dart:convert';
 import "dart:core";
 import "dart:io";
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:http/http.dart' as http;
 import "package:test/test.dart";
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   HttpServer server;
@@ -56,7 +56,7 @@ void main() {
       expect(response.statusCode, 200);
       expect(json.decode(response.body), m);
 
-      response = await http.post("http://localhost:4040/");
+      response = await http.post(Uri.parse('http://localhost:4040/'));
       expect(response.statusCode, 200);
       expect(response.headers["content-type"], isNull);
       expect(response.body, "");
@@ -72,8 +72,7 @@ void main() {
 
     test("Can use ignore filters", () async {
       server = await enableController("/", () => FilterController());
-      expect(json.decode((await postJSON({"required": "", "ignore": ""})).body),
-          {"required": ""});
+      expect(json.decode((await postJSON({"required": "", "ignore": ""})).body), {"required": ""});
     });
 
     test("Can use error filters", () async {
@@ -88,8 +87,7 @@ void main() {
 
     test("Can use accept filters", () async {
       server = await enableController("/", () => FilterController());
-      final response =
-          await postJSON({"required": "", "accept": "", "noAccept": ""});
+      final response = await postJSON({"required": "", "accept": "", "noAccept": ""});
 
       expect(json.decode(response.body), {"required": "", "accept": ""});
     });
@@ -153,9 +151,8 @@ void main() {
     test("Can get a list of bytes from an octet-stream", () async {
       server = await enableController("/", () => ByteListController());
 
-      final response = await http.post("http://localhost:4040",
-          headers: {"Content-Type": "application/octet-stream"},
-          body: [1, 2, 3]).catchError((err) => null);
+      final response = await http.post(Uri.parse('http://localhost:4040'),
+          headers: {"Content-Type": "application/octet-stream"}, body: [1, 2, 3]).catchError((err) => null);
 
       expect(response.statusCode, 200);
       expect(response.bodyBytes, [1, 2, 3]);
@@ -197,8 +194,7 @@ void main() {
       ];
       var response = await postJSON(m);
       expect(response.statusCode, 400);
-      expect(json.decode(response.body)["error"],
-          contains("request entity was unexpected type"));
+      expect(json.decode(response.body)["error"], contains("request entity was unexpected type"));
     });
 
     test("Is Map when expecting List returns 400", () async {
@@ -206,38 +202,32 @@ void main() {
       var m = {"id": 2, "name": "Bob"};
       var response = await postJSON(m);
       expect(response.statusCode, 400);
-      expect(json.decode(response.body)["error"],
-          contains("request entity was unexpected type"));
+      expect(json.decode(response.body)["error"], contains("request entity was unexpected type"));
     });
 
     test("If required body and no body included, return 400", () async {
       server = await enableController("/", () => TestController());
       var response = await postJSON(null);
       expect(response.statusCode, 400);
-      expect(json.decode(response.body)["error"],
-          contains("missing required body"));
+      expect(json.decode(response.body)["error"], contains("missing required body"));
     });
 
     test("Expect list of objects, got list of strings", () async {
       server = await enableController("/", () => ListTestController());
       var response = await postJSON(["a", "b"]);
       expect(response.statusCode, 400);
-      expect(json.decode(response.body)["error"],
-          contains("request entity was unexpected type"));
+      expect(json.decode(response.body)["error"], contains("request entity was unexpected type"));
     });
   });
 }
 
 Future<http.Response> postJSON(dynamic body) {
   if (body == null) {
-    return http.post("http://localhost:4040", headers: {
-      "Content-Type": "application/json"
-    }).catchError((err) => null);
+    return http.post(Uri.parse('http://localhost:4040'),
+        headers: {"Content-Type": "application/json"}).catchError((err) => null);
   }
   return http
-      .post("http://localhost:4040",
-          headers: {"Content-Type": "application/json"},
-          body: json.encode(body))
+      .post(Uri.parse('http://localhost:4040'), headers: {"Content-Type": "application/json"}, body: json.encode(body))
       .catchError((err) => null);
 }
 
@@ -368,13 +358,11 @@ class ByteListController extends ResourceController {
 
   @Operation.post()
   Future<Response> create(@Bind.body() List<int> tm) async {
-    return Response.ok(tm)
-      ..contentType = ContentType("application", "octet-stream");
+    return Response.ok(tm)..contentType = ContentType("application", "octet-stream");
   }
 }
 
-Future<HttpServer> enableController(
-    String pattern, Controller instantiate()) async {
+Future<HttpServer> enableController(String pattern, Controller instantiate()) async {
   var router = Router();
   router.route(pattern).link(instantiate);
   router.didAddToChannel();

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:aqueduct/src/application/channel.dart';
-import 'package:aqueduct/src/application/service_registry.dart';
-import 'package:aqueduct/src/db/managed/data_model_manager.dart';
-import 'package:aqueduct/src/http/http.dart';
-import 'package:aqueduct/src/openapi/documentable.dart';
+import 'package:aqueduct_2/src/application/channel.dart';
+import 'package:aqueduct_2/src/application/service_registry.dart';
+import 'package:aqueduct_2/src/db/managed/data_model_manager.dart';
+import 'package:aqueduct_2/src/http/http.dart';
+import 'package:aqueduct_2/src/openapi/documentable.dart';
 
 import '../persistent_store/persistent_store.dart';
 import '../query/query.dart';

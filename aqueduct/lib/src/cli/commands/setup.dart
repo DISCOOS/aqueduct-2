@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/metadata.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/metadata.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
 
 class CLISetup extends CLICommand with CLIProject {
   bool get shouldSetupHeroku => herokuName != null;
 
-  @Option("heroku",
-      help:
-          "DEPRECATED. Please see https://aqueduct.io/docs/deploy/deploy_heroku/.")
+  @Option("heroku", help: "DEPRECATED. Please see https://discoos.github.io/aqueduct-2/docs/deploy/deploy_heroku/.")
   String get herokuName => decode("heroku");
 
   @Flag("tests",
@@ -18,24 +16,20 @@ class CLISetup extends CLICommand with CLIProject {
           "Sets up a local database to run application tests. If no other option is on, the command defaults to this flag.")
   bool get shouldSetupTests => decode("tests");
 
-  @Flag("confirm",
-      abbr: "c",
-      negatable: false,
-      help: "Confirms that you wish to carry out this setup.")
+  @Flag("confirm", abbr: "c", negatable: false, help: "Confirms that you wish to carry out this setup.")
   bool get confirm => decode("confirm");
 
   @Option("granting-user",
       abbr: "u",
       defaultsTo: "postgres",
-      help:
-          "The username of the PostgreSQL user that has privileges to create a new test user and test database.")
+      help: "The username of the PostgreSQL user that has privileges to create a new test user and test database.")
   String get grantingUser => decode("granting-user");
 
   @override
   Future<int> handle() async {
     if (shouldSetupHeroku) {
       displayInfo("This option has been deprecated.");
-      displayProgress("Please see https://aqueduct.io/docs/deploy/deploy_heroku/ for instructions.");
+      displayProgress("Please see https://discoos.github.io/aqueduct-2/docs/deploy/deploy_heroku/ for instructions.");
       return 0;
     } else /*if (shouldSetupTests*/ {
       return setupTestEnvironment();
@@ -68,10 +62,8 @@ class CLISetup extends CLICommand with CLIProject {
 
     if (!confirm) {
       displayInfo("Confirmation Needed");
-      displayProgress(
-          "This command will execute SQL to create a test database.");
-      displayProgress(
-          "As a security measure, you must add --confirm (or -c) to this command.");
+      displayProgress("This command will execute SQL to create a test database.");
+      displayProgress("As a security measure, you must add --confirm (or -c) to this command.");
       displayProgress("The commands that will be run upon confirmation:");
       commands.forEach((cmd) {
         displayProgress("\t* psql -c '$cmd' -U $grantingUser");
@@ -88,13 +80,11 @@ class CLISetup extends CLICommand with CLIProject {
       if (output.contains("CREATE DATABASE")) {
         displayProgress("Successfully created database dart_test.");
       } else if (output.contains("CREATE ROLE")) {
-        displayProgress(
-            "Successfully created role 'dart' with createdb permissions.");
+        displayProgress("Successfully created role 'dart' with createdb permissions.");
       } else if (output.contains("ALTER ROLE")) {
         displayProgress("Successfully set user 'dart' password to 'dart'.");
       } else if (output.contains("GRANT")) {
-        displayProgress(
-            "Successfully granted all privileges to database dart_test to user 'dart'.");
+        displayProgress("Successfully granted all privileges to database dart_test to user 'dart'.");
       }
 
       if (output.contains("database \"dart_test\" already exists")) {
@@ -102,8 +92,7 @@ class CLISetup extends CLICommand with CLIProject {
       } else if (output.contains("role \"dart\" already exists")) {
         displayProgress("User 'dart' already exists, continuing.");
       } else if (output.contains("could not connect to server")) {
-        displayError(
-            "Database is not accepting connections. Ensure that PostgreSQL is running locally.");
+        displayError("Database is not accepting connections. Ensure that PostgreSQL is running locally.");
 
         return -1;
       } else if ((result.stderr as String).isNotEmpty) {
@@ -112,8 +101,7 @@ class CLISetup extends CLICommand with CLIProject {
       }
     }
 
-    displayInfo(
-        "Congratulations! Aqueduct applications can now be tested locally.");
+    displayInfo("Congratulations! Aqueduct applications can now be tested locally.");
 
     return 0;
   }

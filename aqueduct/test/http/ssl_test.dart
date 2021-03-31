@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -16,20 +16,14 @@ void main() {
       var ciDirUri = getCIDirectoryUri();
 
       app = Application<TestChannel>()
-        ..options.certificateFilePath = ciDirUri
-            .resolve("aqueduct.cert.pem")
-            .toFilePath(windows: Platform.isWindows)
-        ..options.privateKeyFilePath = ciDirUri
-            .resolve("aqueduct.key.pem")
-            .toFilePath(windows: Platform.isWindows);
+        ..options.certificateFilePath = ciDirUri.resolve("aqueduct.cert.pem").toFilePath(windows: Platform.isWindows)
+        ..options.privateKeyFilePath = ciDirUri.resolve("aqueduct.key.pem").toFilePath(windows: Platform.isWindows);
 
       await app.start(numberOfInstances: 1);
 
       var completer = Completer<List<int>>();
-      var socket = await SecureSocket.connect("localhost", 8888,
-          onBadCertificate: (_) => true);
-      var request =
-          "GET /r HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
+      var socket = await SecureSocket.connect("localhost", 8888, onBadCertificate: (_) => true);
+      var request = "GET /r HTTP/1.1\r\nConnection: close\r\nHost: localhost\r\n\r\n";
       socket.add(request.codeUnits);
 
       socket.listen((bytes) => completer.complete(bytes));
@@ -42,9 +36,7 @@ void main() {
 
 Uri getCIDirectoryUri() {
   final env = Platform.environment['AQUEDUCT_CI_DIR_LOCATION'];
-  return env != null
-      ? Uri.parse(env)
-      : Directory.current.uri.resolve("../").resolve("ci/");
+  return env != null ? Uri.parse(env) : Directory.current.uri.resolve("../").resolve("ci/");
 }
 
 class TestChannel extends ApplicationChannel {

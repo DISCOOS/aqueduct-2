@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/auth/auth.dart';
-import 'package:aqueduct/src/http/resource_controller_interfaces.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/auth/auth.dart';
+import 'package:aqueduct_2/src/http/resource_controller_interfaces.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:runtime/runtime.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 import 'http.dart';
 
@@ -61,15 +61,12 @@ import 'http.dart';
 ///           }
 ///         }
 ///
-/// Bindings will automatically parse values into other types and validate that requests have the desired values. See [Bind] for all possible bindings and https://aqueduct.io/docs/http/resource_controller/ for more details.
+/// Bindings will automatically parse values into other types and validate that requests have the desired values. See [Bind] for all possible bindings and https://discoos.github.io/aqueduct-2/docs/http/resource_controller/ for more details.
 ///
 /// To access the request directly, use [request]. Note that the [Request.body] of [request] will be decoded prior to invoking an operation method.
-abstract class ResourceController extends Controller
-    implements Recyclable<Null> {
+abstract class ResourceController extends Controller implements Recyclable<Null> {
   ResourceController() {
-    _runtime =
-        (RuntimeContext.current.runtimes[runtimeType] as ControllerRuntime)
-            ?.resourceController;
+    _runtime = (RuntimeContext.current.runtimes[runtimeType] as ControllerRuntime)?.resourceController;
   }
 
   @override
@@ -155,18 +152,15 @@ abstract class ResourceController extends Controller
   /// this method. When overriding this method, call the superclass' implementation and add the additional parameters
   /// to the returned list before returning the combined list.
   @mustCallSuper
-  List<APIParameter> documentOperationParameters(
-      APIDocumentContext context, Operation operation) {
-    return _runtime.documenter
-        ?.documentOperationParameters(this, context, operation);
+  List<APIParameter> documentOperationParameters(APIDocumentContext context, Operation operation) {
+    return _runtime.documenter?.documentOperationParameters(this, context, operation);
   }
 
   /// Returns a documented summary for [operation].
   ///
   /// By default, this method returns null and the summary is derived from documentation comments
   /// above the operation method. You may override this method to manually add a summary to an operation.
-  String documentOperationSummary(
-      APIDocumentContext context, Operation operation) {
+  String documentOperationSummary(APIDocumentContext context, Operation operation) {
     return null;
   }
 
@@ -174,8 +168,7 @@ abstract class ResourceController extends Controller
   ///
   /// By default, this method returns null and the description is derived from documentation comments
   /// above the operation method. You may override this method to manually add a description to an operation.
-  String documentOperationDescription(
-      APIDocumentContext context, Operation operation) {
+  String documentOperationDescription(APIDocumentContext context, Operation operation) {
     return null;
   }
 
@@ -184,10 +177,8 @@ abstract class ResourceController extends Controller
   /// If an operation method binds an [Bind.body] argument or accepts form data, this method returns a [APIRequestBody]
   /// that describes the bound body type. You may override this method to take an alternative approach or to augment the
   /// automatically generated request body documentation.
-  APIRequestBody documentOperationRequestBody(
-      APIDocumentContext context, Operation operation) {
-    return _runtime.documenter
-        ?.documentOperationRequestBody(this, context, operation);
+  APIRequestBody documentOperationRequestBody(APIDocumentContext context, Operation operation) {
+    return _runtime.documenter?.documentOperationRequestBody(this, context, operation);
   }
 
   /// Returns a map of possible responses for [operation].
@@ -195,8 +186,7 @@ abstract class ResourceController extends Controller
   /// To provide documentation for an operation, you must override this method and return a map of
   /// possible responses. The key is a [String] representation of a status code (e.g., "200") and the value
   /// is an [APIResponse] object.
-  Map<String, APIResponse> documentOperationResponses(
-      APIDocumentContext context, Operation operation) {
+  Map<String, APIResponse> documentOperationResponses(APIDocumentContext context, Operation operation) {
     return {"200": APIResponse("Successful response.")};
   }
 
@@ -206,15 +196,13 @@ abstract class ResourceController extends Controller
   /// defined by this controller in the same tag. You may override this method
   /// to provide additional tags. You should call the superclass' implementation to retain
   /// the controller grouping tag.
-  List<String> documentOperationTags(
-      APIDocumentContext context, Operation operation) {
+  List<String> documentOperationTags(APIDocumentContext context, Operation operation) {
     final tag = "$runtimeType".replaceAll("Controller", "");
     return [tag];
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
-      APIDocumentContext context, String route, APIPath path) {
+  Map<String, APIOperation> documentOperations(APIDocumentContext context, String route, APIPath path) {
     return _runtime.documenter?.documentOperations(this, context, route, path);
   }
 
@@ -226,8 +214,7 @@ abstract class ResourceController extends Controller
   bool _requestContentTypeIsSupported(Request req) {
     var incomingContentType = request.raw.headers.contentType;
     return acceptedContentTypes.firstWhere((ct) {
-          return ct.primaryType == incomingContentType.primaryType &&
-              ct.subType == incomingContentType.subType;
+          return ct.primaryType == incomingContentType.primaryType && ct.subType == incomingContentType.subType;
         }, orElse: () => null) !=
         null;
   }
@@ -246,33 +233,22 @@ abstract class ResourceController extends Controller
       }
     }
 
-    final operation = _runtime.getOperationRuntime(
-        request.raw.method, request.path.variables.keys.toList());
+    final operation = _runtime.getOperationRuntime(request.raw.method, request.path.variables.keys.toList());
     if (operation == null) {
-      throw Response(
-          405,
-          {
-            "Allow":
-                _allowedMethodsForPathVariables(request.path.variables.keys)
-                    .join(", ")
-          },
-          null);
+      throw Response(405, {"Allow": _allowedMethodsForPathVariables(request.path.variables.keys).join(", ")}, null);
     }
 
     if (operation.scopes != null) {
       if (request.authorization == null) {
         // todo: this should be done compile-time
-        Logger("aqueduct").warning(
-            "'${runtimeType}' must be linked to channel that contains an 'Authorizer', because "
+        Logger("aqueduct").warning("'${runtimeType}' must be linked to channel that contains an 'Authorizer', because "
             "it uses 'Scope' annotation for one or more of its operation methods.");
         throw Response.serverError();
       }
 
       if (!AuthScope.verify(operation.scopes, request.authorization.scopes)) {
-        throw Response.forbidden(body: {
-          "error": "insufficient_scope",
-          "scope": operation.scopes.map((s) => s.toString()).join(" ")
-        });
+        throw Response.forbidden(
+            body: {"error": "insufficient_scope", "scope": operation.scopes.map((s) => s.toString()).join(" ")});
       }
     }
 
@@ -289,8 +265,7 @@ abstract class ResourceController extends Controller
       try {
         return f();
       } on ArgumentError catch (e) {
-        errors.add(
-            "${e.message as String} for ${p.locationName} value '${p.name}'");
+        errors.add("${e.message as String} for ${p.locationName} value '${p.name}'");
       }
       return null;
     };
@@ -299,8 +274,7 @@ abstract class ResourceController extends Controller
         if (p.location == BindingType.body) {
           errors.add("missing required ${p.locationName}");
         } else {
-          errors.add(
-            "missing required ${p.locationName} '${p.name ?? ""}'");
+          errors.add("missing required ${p.locationName} '${p.name ?? ""}'");
         }
         return null;
       }

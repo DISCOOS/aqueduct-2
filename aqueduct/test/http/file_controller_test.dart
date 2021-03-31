@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -18,11 +18,9 @@ void main() {
   var jsFile = File.fromUri(fileDirectory.uri.resolve("file.js"));
   var htmlFile = File.fromUri(fileDirectory.uri.resolve("file.html"));
   var indexFile = File.fromUri(fileDirectory.uri.resolve("index.html"));
-  var unknownFileExtension =
-      File.fromUri(fileDirectory.uri.resolve("file.unk"));
+  var unknownFileExtension = File.fromUri(fileDirectory.uri.resolve("file.unk"));
   var noFileExtension = File.fromUri(fileDirectory.uri.resolve("file"));
-  var sillyFileExtension =
-      File.fromUri(fileDirectory.uri.resolve("file.silly"));
+  var sillyFileExtension = File.fromUri(fileDirectory.uri.resolve("file.silly"));
   var subdir = Directory.fromUri(fileDirectory.uri.resolve("subdir/"));
   var subdirFile = File.fromUri(subdir.uri.resolve("index.html"));
 
@@ -43,32 +41,20 @@ void main() {
     jsFile.writeAsBytesSync(utf8.encode(jsContents));
 
     var cachingController = FileController("temp_files")
-      ..addCachePolicy(const CachePolicy(requireConditionalRequest: true),
-          (path) => path.endsWith(".html"))
+      ..addCachePolicy(const CachePolicy(requireConditionalRequest: true), (path) => path.endsWith(".html"))
       ..addCachePolicy(
           const CachePolicy(expirationFromNow: Duration(seconds: 31536000)),
-          (path) => [
-                ".jpg",
-                ".js",
-                ".png",
-                ".css",
-                ".jpeg",
-                ".ttf",
-                ".eot",
-                ".woff",
-                ".otf"
-              ].any((suffix) => path.endsWith(suffix)));
+          (path) => [".jpg", ".js", ".png", ".css", ".jpeg", ".ttf", ".eot", ".woff", ".otf"]
+              .any((suffix) => path.endsWith(suffix)));
 
     var router = Router()
       ..route("/files/*").link(() => FileController("temp_files"))
-      ..route("/redirect/*").link(
-          () => FileController("temp_files", onFileNotFound: (c, r) async {
-                return Response.ok({"k": "v"});
-              }))
+      ..route("/redirect/*").link(() => FileController("temp_files", onFileNotFound: (c, r) async {
+            return Response.ok({"k": "v"});
+          }))
       ..route("/cache/*").link(() => cachingController)
       ..route("/silly/*").link(() => FileController("temp_files")
-        ..setContentTypeForExtension(
-            "silly", ContentType("text", "html", charset: "utf-8")));
+        ..setContentTypeForExtension("silly", ContentType("text", "html", charset: "utf-8")));
     router.didAddToChannel();
 
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8888);
@@ -115,11 +101,8 @@ void main() {
     expect(response.body, contains("<html>"));
   });
 
-  test(
-      "If 404 response to request without Accept: text/html, do not include HTML body",
-      () async {
-    var response = await getFile("/file.foobar",
-        headers: {HttpHeaders.acceptHeader: "text/plain"});
+  test("If 404 response to request without Accept: text/html, do not include HTML body", () async {
+    var response = await getFile("/file.foobar", headers: {HttpHeaders.acceptHeader: "text/plain"});
     expect(response.headers["last-modified"], isNull);
     expect(response.headers["cache-control"], isNull);
     expect(response.headers["content-type"], isNull);
@@ -202,7 +185,7 @@ void main() {
   });
 
   test("Can add extension", () async {
-    var response = await http.get("http://localhost:8888/silly/file.silly");
+    var response = await http.get(Uri.parse('http://localhost:8888/silly/file.silly'));
     expect(response.statusCode, 200);
     expect(response.headers["content-type"], "text/html; charset=utf-8");
     expect(response.headers["content-encoding"], "gzip");
@@ -212,11 +195,9 @@ void main() {
     expect(response.body, htmlContents);
   });
 
-  test("Client connection closed before data is sent still shuts down stream",
-      () async {
+  test("Client connection closed before data is sent still shuts down stream", () async {
     var socket = await Socket.connect("localhost", 8888);
-    var request =
-        "GET /files/file.html HTTP/1.1\r\nConnection: keep-alive\r\nHost: localhost\r\n\r\n";
+    var request = "GET /files/file.html HTTP/1.1\r\nConnection: keep-alive\r\nHost: localhost\r\n\r\n";
     socket.add(request.codeUnits);
     await socket.flush();
     socket.destroy();
@@ -229,8 +210,7 @@ void main() {
   });
 
   test("Provide onFileNotFound provides another response", () async {
-    var response =
-        await http.get("http://localhost:8888/redirect/jkasdjlkasjdksadj");
+    var response = await http.get(Uri.parse('http://localhost:8888/redirect/jkasdjlkasjdksadj'));
     expect(response.statusCode, 200);
     expect(json.decode(response.body), {"k": "v"});
   });
@@ -239,8 +219,7 @@ void main() {
     test("Uncached file has no cache-control", () async {
       var response = await getCacheableFile("/file.json");
       expect(response.statusCode, 200);
-      expect(
-          response.headers["content-type"], "application/json; charset=utf-8");
+      expect(response.headers["content-type"], "application/json; charset=utf-8");
       expect(response.headers["content-encoding"], "gzip");
       expect(response.headers["transfer-encoding"], "chunked");
       expect(response.headers["cache-control"], isNull);
@@ -259,11 +238,8 @@ void main() {
       expect(response.body, htmlContents);
     });
 
-    test(
-        "Fetch file with If-Modified-Since before last modified date, returns file",
-        () async {
-      var response =
-          await getCacheableFile("/file.html", ifModifiedSince: DateTime(2000));
+    test("Fetch file with If-Modified-Since before last modified date, returns file", () async {
+      var response = await getCacheableFile("/file.html", ifModifiedSince: DateTime(2000));
       expect(response.statusCode, 200);
       expect(response.headers["content-type"], "text/html; charset=utf-8");
       expect(response.headers["content-encoding"], "gzip");
@@ -273,11 +249,9 @@ void main() {
       expect(response.body, htmlContents);
     });
 
-    test(
-        "Fetch file with If-Modified-Since after last modified date, returns 304 with no body",
-        () async {
-      var response = await getCacheableFile("/file.html",
-          ifModifiedSince: DateTime.now().add(const Duration(hours: 1)));
+    test("Fetch file with If-Modified-Since after last modified date, returns 304 with no body", () async {
+      var response =
+          await getCacheableFile("/file.html", ifModifiedSince: DateTime.now().add(const Duration(hours: 1)));
       expect(response.statusCode, 304);
       expect(response.headers["content-type"], isNull);
       expect(response.headers["content-encoding"], isNull);
@@ -290,8 +264,7 @@ void main() {
     test("JS file has large max-age", () async {
       var response = await getCacheableFile("/file.js");
       expect(response.statusCode, 200);
-      expect(response.headers["content-type"],
-          "application/javascript; charset=utf-8");
+      expect(response.headers["content-type"], "application/javascript; charset=utf-8");
       expect(response.headers["content-encoding"], "gzip");
       expect(response.headers["transfer-encoding"], "chunked");
       expect(response.headers["cache-control"], "public, max-age=31536000");
@@ -312,20 +285,17 @@ void main() {
   });
 }
 
-Future<http.Response> getFile(String path,
-    {Map<String, String> headers}) async {
-  return http.get("http://localhost:8888/files$path", headers: headers);
+Future<http.Response> getFile(String path, {Map<String, String> headers}) async {
+  return http.get(Uri.parse('http://localhost:8888/files$path'), headers: headers);
 }
 
-Future<http.Response> getCacheableFile(String path,
-    {DateTime ifModifiedSince}) async {
+Future<http.Response> getCacheableFile(String path, {DateTime ifModifiedSince}) async {
   if (ifModifiedSince == null) {
-    return http.get("http://localhost:8888/cache$path");
+    return http.get(Uri.parse('http://localhost:8888/cache$path'));
   }
 
-  return http.get("http://localhost:8888/cache$path", headers: {
-    HttpHeaders.ifModifiedSinceHeader: HttpDate.format(ifModifiedSince)
-  });
+  return http.get(Uri.parse('http://localhost:8888/cache$path'),
+      headers: {HttpHeaders.ifModifiedSinceHeader: HttpDate.format(ifModifiedSince)});
 }
 
 Future serverHasNoMoreConnections(HttpServer server) async {

@@ -1,10 +1,8 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test(
-      "Add Table to table definition with non-existent property in unique list throws exception",
-      () {
+  test("Add Table to table definition with non-existent property in unique list throws exception", () {
     try {
       ManagedDataModel([MultiUniqueFailureUnknown]);
       expect(true, false);
@@ -14,8 +12,7 @@ void main() {
   });
 }
 
-class MultiUniqueFailureUnknown
-    extends ManagedObject<_MultiUniqueFailureUnknown> {}
+class MultiUniqueFailureUnknown extends ManagedObject<_MultiUniqueFailureUnknown> {}
 
 @Table.unique([Symbol('a'), Symbol('b')])
 class _MultiUniqueFailureUnknown {

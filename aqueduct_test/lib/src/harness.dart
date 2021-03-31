@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:aqueduct_test/aqueduct_test.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +29,7 @@ import 'package:test/test.dart';
 ///           final harness = Harness()..install();
 ///
 ///           test("GET /example returns 200", () async {
-///             final response = await harness.agent.get("/example");
+///             final response = await harness.agent.get(Uri.parse('/example'));
 ///             expectResponse(response, 200);
 ///           });
 ///         }

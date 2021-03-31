@@ -1,118 +1,56 @@
 import 'dart:async';
 import "dart:core";
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   APIDocument doc;
   setUpAll(() async {
-    doc = await Application.document(
-        Channel, ApplicationOptions(), {"version": "1.0", "name": "desc"});
+    doc = await Application.document(Channel, ApplicationOptions(), {"version": "1.0", "name": "desc"});
   });
 
-  test(
-      "If method has scopes, add them to list of scopes if does not exist in Authorizer",
-      () {
-    expect(
-        doc.paths["/level1-authorizer"].operations["get"].security.length, 1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["get"].security.first
-            .requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["get"].security.first
-            .requirements["oauth2"],
-        ["level1"]);
+  test("If method has scopes, add them to list of scopes if does not exist in Authorizer", () {
+    expect(doc.paths["/level1-authorizer"].operations["get"].security.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["get"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["get"].security.first.requirements["oauth2"], ["level1"]);
 
+    expect(doc.paths["/level1-authorizer"].operations["post"].security.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["post"].security.first.requirements.length, 1);
     expect(
-        doc.paths["/level1-authorizer"].operations["post"].security.length, 1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["post"].security.first
-            .requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["post"].security.first
-            .requirements["oauth2"],
+        doc.paths["/level1-authorizer"].operations["post"].security.first.requirements["oauth2"], ["level1", "level2"]);
+
+    expect(doc.paths["/level1-authorizer"].operations["delete"].security.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["delete"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["delete"].security.first.requirements["oauth2"],
         ["level1", "level2"]);
 
-    expect(doc.paths["/level1-authorizer"].operations["delete"].security.length,
-        1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["delete"].security.first
-            .requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["delete"].security.first
-            .requirements["oauth2"],
-        ["level1", "level2"]);
-
-    expect(
-        doc.paths["/level1-authorizer"].operations["put"].security.length, 1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["put"].security.first
-            .requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-authorizer"].operations["put"].security.first
-            .requirements["oauth2"],
-        ["level1"]);
+    expect(doc.paths["/level1-authorizer"].operations["put"].security.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["put"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-authorizer"].operations["put"].security.first.requirements["oauth2"], ["level1"]);
   });
 
-  test("If authorizer has less scope than method scope, method scope is used",
-      () {
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["get"].security
-            .length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["get"].security
-            .first.requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["get"].security
-            .first.requirements["oauth2"],
+  test("If authorizer has less scope than method scope, method scope is used", () {
+    expect(doc.paths["/level1-subscope-authorizer"].operations["get"].security.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["get"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["get"].security.first.requirements["oauth2"],
         ["level1:subscope"]);
 
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["post"].security
-            .length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["post"].security
-            .first.requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["post"].security
-            .first.requirements["oauth2"],
+    expect(doc.paths["/level1-subscope-authorizer"].operations["post"].security.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["post"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["post"].security.first.requirements["oauth2"],
         ["level1:subscope", "level2"]);
 
+    expect(doc.paths["/level1-subscope-authorizer"].operations["put"].security.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["put"].security.first.requirements.length, 1);
     expect(
-        doc.paths["/level1-subscope-authorizer"].operations["put"].security
-            .length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["put"].security
-            .first.requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["put"].security
-            .first.requirements["oauth2"],
-        ["level1"]);
+        doc.paths["/level1-subscope-authorizer"].operations["put"].security.first.requirements["oauth2"], ["level1"]);
 
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["delete"].security
-            .length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["delete"].security
-            .first.requirements.length,
-        1);
-    expect(
-        doc.paths["/level1-subscope-authorizer"].operations["delete"].security
-            .first.requirements["oauth2"],
+    expect(doc.paths["/level1-subscope-authorizer"].operations["delete"].security.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["delete"].security.first.requirements.length, 1);
+    expect(doc.paths["/level1-subscope-authorizer"].operations["delete"].security.first.requirements["oauth2"],
         ["level1", "level2"]);
   });
 
@@ -138,18 +76,12 @@ class Channel extends ApplicationChannel {
     router.route("/auth/token").link(() => AuthController(authServer));
 
     router.route("/no-authorizer").link(() => C1());
-    router
-        .route("/level1-authorizer")
-        .link(() => Authorizer.bearer(authServer, scopes: ["level1"]))
-        .link(() => C1());
+    router.route("/level1-authorizer").link(() => Authorizer.bearer(authServer, scopes: ["level1"])).link(() => C1());
     router
         .route("/level1-subscope-authorizer")
         .link(() => Authorizer.bearer(authServer, scopes: ["level1:subscope"]))
         .link(() => C1());
-    router
-        .route("/authorizer")
-        .link(() => Authorizer.bearer(authServer))
-        .link(() => C1());
+    router.route("/authorizer").link(() => Authorizer.bearer(authServer)).link(() => C1());
 
     return router;
   }

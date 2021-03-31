@@ -1,9 +1,9 @@
 import 'dart:mirrors';
 
-import 'package:aqueduct/src/auth/auth.dart';
-import 'package:aqueduct/src/http/http.dart';
-import 'package:aqueduct/src/http/resource_controller_bindings.dart';
-import 'package:aqueduct/src/http/resource_controller_scope.dart';
+import 'package:aqueduct_2/src/auth/auth.dart';
+import 'package:aqueduct_2/src/http/http.dart';
+import 'package:aqueduct_2/src/http/resource_controller_bindings.dart';
+import 'package:aqueduct_2/src/http/resource_controller_scope.dart';
 
 bool isOperation(DeclarationMirror m) {
   return getMethodOperationMetadata(m) != null;

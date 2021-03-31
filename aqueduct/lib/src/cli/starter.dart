@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 /*
   Warning: do not remove. This method is invoked by a generated script.
 
  */
-Future startApplication<T extends ApplicationChannel>(
-    Application<T> app, int isolateCount, SendPort parentPort) async {
+Future startApplication<T extends ApplicationChannel>(Application<T> app, int isolateCount, SendPort parentPort) async {
   final port = ReceivePort();
 
   port.listen((msg) {

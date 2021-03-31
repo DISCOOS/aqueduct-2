@@ -1,14 +1,14 @@
 import 'dart:mirrors';
 
-import 'package:aqueduct/src/http/resource_controller_bindings.dart';
-import 'package:aqueduct/src/http/resource_controller_interfaces.dart';
-import 'package:aqueduct/src/runtime/resource_controller/documenter.dart';
-import 'package:aqueduct/src/runtime/resource_controller_impl.dart';
-import 'package:aqueduct/src/utilities/sourcify.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/src/http/resource_controller_bindings.dart';
+import 'package:aqueduct_2/src/http/resource_controller_interfaces.dart';
+import 'package:aqueduct_2/src/runtime/resource_controller/documenter.dart';
+import 'package:aqueduct_2/src/runtime/resource_controller_impl.dart';
+import 'package:aqueduct_2/src/utilities/sourcify.dart';
+import 'package:runtime_2/runtime_2.dart';
 
-String getInvokerSource(BuildContext context,
-    ResourceControllerRuntimeImpl controller, ResourceControllerOperation op) {
+String getInvokerSource(
+    BuildContext context, ResourceControllerRuntimeImpl controller, ResourceControllerOperation op) {
   final buf = StringBuffer();
   final subclassName = MirrorSystem.getName(controller.type.simpleName);
 
@@ -24,8 +24,7 @@ String getInvokerSource(BuildContext context,
   op.namedParameters.forEach((p) {
     var defaultValue = sourcifyValue(p.defaultValue);
 
-    buf.writeln(
-        "    ${p.symbolName}: args.namedArguments['${p.symbolName}'] as ${p.type} ?? $defaultValue,");
+    buf.writeln("    ${p.symbolName}: args.namedArguments['${p.symbolName}'] as ${p.type} ?? $defaultValue,");
   });
 
   buf.writeln("  );");
@@ -34,8 +33,7 @@ String getInvokerSource(BuildContext context,
   return buf.toString();
 }
 
-String getApplyRequestPropertiesSource(
-    BuildContext context, ResourceControllerRuntimeImpl runtime) {
+String getApplyRequestPropertiesSource(BuildContext context, ResourceControllerRuntimeImpl runtime) {
   StringBuffer buf = StringBuffer();
   final subclassName = MirrorSystem.getName(runtime.type.simpleName);
 
@@ -47,14 +45,9 @@ String getApplyRequestPropertiesSource(
   return buf.toString();
 }
 
-String getResourceControllerImplSource(
-    BuildContext context, ResourceControllerRuntimeImpl runtime) {
-  final ivarSources = runtime.ivarParameters
-      .map((i) => getParameterSource(context, runtime, i))
-      .join(",\n");
-  final operationSources = runtime.operations
-      .map((o) => getOperationSource(context, runtime, o))
-      .join(",\n");
+String getResourceControllerImplSource(BuildContext context, ResourceControllerRuntimeImpl runtime) {
+  final ivarSources = runtime.ivarParameters.map((i) => getParameterSource(context, runtime, i)).join(",\n");
+  final operationSources = runtime.operations.map((o) => getOperationSource(context, runtime, o)).join(",\n");
 
   return """
 class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
@@ -72,9 +65,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
 }
 
 String getDecoderSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
-    ResourceControllerParameter parameter) {
+    BuildContext context, ResourceControllerRuntimeImpl runtime, ResourceControllerParameter parameter) {
   switch (parameter.location) {
     case BindingType.path:
       {
@@ -169,8 +160,7 @@ String getElementDecoderSource(Type type) {
 
 String getListDecoderSource(ResourceControllerParameter p) {
   if (reflectType(p.type).isSubtypeOf(reflectType(List))) {
-    final mapper = getElementDecoderSource(
-      reflectType(p.type).typeArguments.first.reflectedType);
+    final mapper = getElementDecoderSource(reflectType(p.type).typeArguments.first.reflectedType);
     return """(v) {
   return ${p.type}.from((v as List).map($mapper));  
 }  """;
@@ -187,9 +177,7 @@ String getListDecoderSource(ResourceControllerParameter p) {
 }
 
 String getParameterSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
-    ResourceControllerParameter parameter) {
+    BuildContext context, ResourceControllerRuntimeImpl runtime, ResourceControllerParameter parameter) {
   return """
 ResourceControllerParameter.make<${parameter.type}>(
   name: ${sourcifyValue(parameter.name)},
@@ -206,16 +194,11 @@ ResourceControllerParameter.make<${parameter.type}>(
 }
 
 String getOperationSource(
-    BuildContext context,
-    ResourceControllerRuntimeImpl runtime,
-    ResourceControllerOperation operation) {
+    BuildContext context, ResourceControllerRuntimeImpl runtime, ResourceControllerOperation operation) {
   final scopeElements = operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})")?.join(",");
-  final namedParameters = operation.namedParameters
-      .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
-  final positionalParameters = operation.positionalParameters
-      .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
+  final namedParameters = operation.namedParameters.map((p) => getParameterSource(context, runtime, p)).join(",");
+  final positionalParameters =
+      operation.positionalParameters.map((p) => getParameterSource(context, runtime, p)).join(",");
   final pathVars = operation.pathVariables.map((s) => "'$s'").join(",");
 
   return """

@@ -1,10 +1,10 @@
-import 'package:aqueduct/src/openapi/documentable.dart';
-import 'package:aqueduct/src/utilities/reference_counting_list.dart';
+import 'package:aqueduct_2/src/openapi/documentable.dart';
+import 'package:aqueduct_2/src/utilities/reference_counting_list.dart';
 
-import 'package:aqueduct/src/db/query/query.dart';
+import 'package:aqueduct_2/src/db/query/query.dart';
 
-import 'package:aqueduct/src/db/managed/managed.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/src/db/managed/managed.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 /// Instances of this class contain descriptions and metadata for mapping [ManagedObject]s to database rows.
 ///
@@ -15,9 +15,7 @@ import 'package:runtime/runtime.dart';
 ///
 /// Most applications do not need to access instances of this type.
 ///
-class ManagedDataModel extends Object
-    with ReferenceCountable
-    implements APIComponentDocumenter {
+class ManagedDataModel extends Object with ReferenceCountable implements APIComponentDocumenter {
   /// Creates an instance of [ManagedDataModel] from a list of types that extend [ManagedObject]. It is preferable
   /// to use [ManagedDataModel.fromCurrentMirrorSystem] over this method.
   ///
@@ -25,24 +23,18 @@ class ManagedDataModel extends Object
   ///
   ///       new DataModel([User, Token, Post]);
   ManagedDataModel(List<Type> instanceTypes) {
-    final runtimes = RuntimeContext.current.runtimes.iterable
-        .whereType<ManagedEntityRuntime>()
-        .toList();
-    final expectedRuntimes = instanceTypes
-        .map((t) => runtimes.firstWhere((e) => e.entity.instanceType == t,
-            orElse: () => null))
-        .toList();
+    final runtimes = RuntimeContext.current.runtimes.iterable.whereType<ManagedEntityRuntime>().toList();
+    final expectedRuntimes =
+        instanceTypes.map((t) => runtimes.firstWhere((e) => e.entity.instanceType == t, orElse: () => null)).toList();
 
     final notFound = expectedRuntimes.where((e) => e == null).toList();
     if (notFound.isNotEmpty) {
-      throw ManagedDataModelError(
-          "Data model types were not found: ${notFound.map((e) => e.entity.name).join(", ")}");
+      throw ManagedDataModelError("Data model types were not found: ${notFound.map((e) => e.entity.name).join(", ")}");
     }
 
     expectedRuntimes.forEach((runtime) {
       _entities[runtime.entity.instanceType] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
-          runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] = runtime.entity;
     });
     expectedRuntimes.forEach((runtime) => runtime.finalize(this));
   }
@@ -57,13 +49,11 @@ class ManagedDataModel extends Object
   ///
   /// This is the preferred method of instantiating this type.
   ManagedDataModel.fromCurrentMirrorSystem() {
-    final runtimes = RuntimeContext.current.runtimes.iterable
-        .whereType<ManagedEntityRuntime>();
+    final runtimes = RuntimeContext.current.runtimes.iterable.whereType<ManagedEntityRuntime>();
 
     runtimes.forEach((runtime) {
       _entities[runtime.entity.instanceType] = runtime.entity;
-      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
-          runtime.entity;
+      _tableDefinitionToEntityMap[runtime.entity.tableDefinition] = runtime.entity;
     });
     runtimes.forEach((runtime) => runtime.finalize(this));
   }

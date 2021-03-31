@@ -1,8 +1,8 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   ManagedContext context;
@@ -12,8 +12,7 @@ void main() {
     context = null;
   });
 
-  test("Accessing valueObject of Query automatically creates an instance",
-      () async {
+  test("Accessing valueObject of Query automatically creates an instance", () async {
     context = await contextWithModels([TestModel]);
 
     var q = Query<TestModel>(context)..values.id = 1;
@@ -35,9 +34,7 @@ void main() {
     }
   });
 
-  test(
-      "Setting a non-null value to null will identify offending column in response",
-      () async {
+  test("Setting a non-null value to null will identify offending column in response", () async {
     context = await contextWithModels([TestModel]);
 
     var m = TestModel()
@@ -59,18 +56,13 @@ void main() {
     context = await contextWithModels([TestModel]);
 
     var insertReq = Query<TestModel>(context)
-      ..valueMap = {
-        "name": "bob",
-        "emailAddress": "bk@a.com",
-        "bad_key": "doesntmatter"
-      };
+      ..valueMap = {"name": "bob", "emailAddress": "bk@a.com", "bad_key": "doesntmatter"};
 
     try {
       await insertReq.insert();
       expect(true, false);
     } on ArgumentError catch (e) {
-      expect(e.toString(),
-          contains("Column 'bad_key' does not exist for table 'simple'"));
+      expect(e.toString(), contains("Column 'bad_key' does not exist for table 'simple'"));
     }
   });
 
@@ -111,9 +103,7 @@ void main() {
     expect(result.emailAddress, "dup1@a.com");
   });
 
-  test(
-      "Insert an object that violates a unique set constraint fails with conflict",
-      () async {
+  test("Insert an object that violates a unique set constraint fails with conflict", () async {
     context = await contextWithModels([MultiUnique]);
 
     var q = Query<MultiUnique>(context)
@@ -182,9 +172,7 @@ void main() {
     expect(jay.emailAddress, "2@a.com");
   });
 
-  test(
-      "Inserting multiple objects with at least one bad one does not insert any objects into the database",
-      () async {
+  test("Inserting multiple objects with at least one bad one does not insert any objects into the database", () async {
     context = await contextWithModels([TestModel]);
 
     var goodModel = TestModel()
@@ -217,9 +205,7 @@ void main() {
 
     var result = await insertReq.insert();
 
-    var readReq = Query<TestModel>(context)
-      ..predicate =
-          QueryPredicate("emailAddress = @email", {"email": "2@a.com"});
+    var readReq = Query<TestModel>(context)..predicate = QueryPredicate("emailAddress = @email", {"email": "2@a.com"});
 
     result = await readReq.fetchOne();
     expect(result.name, "bob");
@@ -243,9 +229,7 @@ void main() {
     expect(successful, false);
   });
 
-  test(
-      "Inserting an object via a values map works and returns appropriate object",
-      () async {
+  test("Inserting an object via a values map works and returns appropriate object", () async {
     context = await contextWithModels([TestModel]);
 
     var insertReq = Query<TestModel>(context)
@@ -407,6 +391,7 @@ class _TestModel {
   @Column(nullable: true, unique: true)
   String emailAddress;
 
+  // ignore: unused_element
   static String tableName() {
     return "simple";
   }
@@ -457,16 +442,14 @@ class _Transient {
   String value;
 }
 
-class BoringObject extends ManagedObject<_BoringObject>
-    implements _BoringObject {}
+class BoringObject extends ManagedObject<_BoringObject> implements _BoringObject {}
 
 class _BoringObject {
   @primaryKey
   int id;
 }
 
-class PrivateField extends ManagedObject<_PrivateField>
-    implements _PrivateField {
+class PrivateField extends ManagedObject<_PrivateField> implements _PrivateField {
   set public(String p) {
     _private = p;
   }

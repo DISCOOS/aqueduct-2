@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 import 'package:path/path.dart' as path;
 import 'http.dart';
 
-typedef _OnFileNotFound = FutureOr<Response> Function(
-    FileController controller, Request req);
+typedef _OnFileNotFound = FutureOr<Response> Function(FileController controller, Request req);
 
 /// Serves files from a directory on the filesystem.
 ///
@@ -40,10 +39,9 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
-    {FutureOr<Response> onFileNotFound(
-      FileController controller, Request req)})
-    : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
-      _onFileNotFound = onFileNotFound;
+      {FutureOr<Response> onFileNotFound(FileController controller, Request req)})
+      : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
+        _onFileNotFound = onFileNotFound;
 
   static Map<String, ContentType> _defaultExtensionMap = {
     /* Web content */
@@ -138,9 +136,7 @@ class FileController extends Controller {
   /// Evaluates each policy added by [addCachePolicy] against the [path] and
   /// returns it if exists.
   CachePolicy cachePolicyForPath(String path) {
-    return _policyPairs
-        .firstWhere((pair) => pair.shouldApplyToPath(path), orElse: () => null)
-        ?.policy;
+    return _policyPairs.firstWhere((pair) => pair.shouldApplyToPath(path), orElse: () => null)?.policy;
   }
 
   @override
@@ -173,8 +169,7 @@ class FileController extends Controller {
     }
 
     var lastModifiedDate = file.lastModifiedSync();
-    var ifModifiedSince =
-        request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
+    var ifModifiedSince = request.raw.headers.value(HttpHeaders.ifModifiedSinceHeader);
     if (ifModifiedSince != null) {
       var date = HttpDate.parse(ifModifiedSince);
       if (!lastModifiedDate.isAfter(date)) {
@@ -183,26 +178,23 @@ class FileController extends Controller {
     }
 
     var lastModifiedDateStringValue = HttpDate.format(lastModifiedDate);
-    var contentType = contentTypeForExtension(path.extension(file.path)) ??
-        ContentType("application", "octet-stream");
+    var contentType = contentTypeForExtension(path.extension(file.path)) ?? ContentType("application", "octet-stream");
     var byteStream = file.openRead();
 
-    return Response.ok(byteStream,
-        headers: {HttpHeaders.lastModifiedHeader: lastModifiedDateStringValue})
+    return Response.ok(byteStream, headers: {HttpHeaders.lastModifiedHeader: lastModifiedDateStringValue})
       ..cachePolicy = _policyForFile(file)
       ..encodeBody = false
       ..contentType = contentType;
   }
 
   @override
-  Map<String, APIOperation> documentOperations(
-      APIDocumentContext context, String route, APIPath path) {
+  Map<String, APIOperation> documentOperations(APIDocumentContext context, String route, APIPath path) {
     return {
       "get": APIOperation(
           "getFile",
           {
-            "200": APIResponse("Successful file fetch.",
-                content: {"*/*": APIMediaType(schema: APISchemaObject.file())}),
+            "200":
+                APIResponse("Successful file fetch.", content: {"*/*": APIMediaType(schema: APISchemaObject.file())}),
             "404": APIResponse("No file exists at path.")
           },
           description: "Content-Type is determined by the suffix of the file.",

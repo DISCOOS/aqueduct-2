@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   HttpServer server;
@@ -19,7 +19,7 @@ void main() {
       throw Response.ok(null);
     }));
 
-    final r = await http.get("http://localhost:4040");
+    final r = await http.get(Uri.parse('http://localhost:4040'));
     expect(r.statusCode, 200);
   });
 
@@ -28,7 +28,7 @@ void main() {
       throw StateError("error");
     }));
 
-    final r = await http.get("http://localhost:4040");
+    final r = await http.get(Uri.parse('http://localhost:4040'));
     expect(r.statusCode, 500);
   });
 
@@ -37,17 +37,16 @@ void main() {
       throw HandlerException(Response.ok(null));
     }));
 
-    final r = await http.get("http://localhost:4040");
+    final r = await http.get(Uri.parse('http://localhost:4040'));
     expect(r.statusCode, 200);
   });
 
-  test("Throw exception when sending HandlerException response sends 500",
-      () async {
+  test("Throw exception when sending HandlerException response sends 500", () async {
     server = await enableController(ClosureController((req) {
       throw CrashingTestHandlerException();
     }));
 
-    final r = await http.get("http://localhost:4040");
+    final r = await http.get(Uri.parse('http://localhost:4040'));
     expect(r.statusCode, 500);
   });
 
@@ -57,7 +56,7 @@ void main() {
       throw Response.ok(PassthruController());
     }));
 
-    final r = await http.get("http://localhost:4040");
+    final r = await http.get(Uri.parse('http://localhost:4040'));
     expect(r.statusCode, 500);
   });
 }

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 // Some CachePolicy fields are tested by file_controller_test.dart, this
 // file tests the combinations not tested there.
@@ -19,14 +19,14 @@ void main() {
   test("Prevent intermediate caching", () async {
     var policy = const CachePolicy(preventIntermediateProxyCaching: true);
     server = await bindAndRespondWith(Response.ok("foo")..cachePolicy = policy);
-    var result = await http.get("http://localhost:8888/");
+    var result = await http.get(Uri.parse('http://localhost:8888/'));
     expect(result.headers["cache-control"], "private");
   });
 
   test("Prevent caching altogether", () async {
     var policy = const CachePolicy(preventCaching: true);
     server = await bindAndRespondWith(Response.ok("foo")..cachePolicy = policy);
-    var result = await http.get("http://localhost:8888/");
+    var result = await http.get(Uri.parse('http://localhost:8888/'));
     expect(result.headers["cache-control"], "no-cache, no-store");
   });
 }

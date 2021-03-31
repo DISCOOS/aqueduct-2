@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 class AutoincrementAndDefault extends ManagedObject<_AutoincrementAndDefault> {}

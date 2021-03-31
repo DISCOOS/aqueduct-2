@@ -1,3 +1,17 @@
+# Changelog
+[Fork](https://github.com/DISCOOS/aqueduct-2)
+managed by [DISCO Open Source](https://www.discoos.org)
+
+## 1.0.0
+
+- Changed library name to aqueduct_2 (breaking change)
+- Upgraded dependencies to latest non-null safe versions
+- Changed to forked versions of not maintained or discontinued packages
+
+Prior versions (discontinued)
+=============================
+Versions of [aqueduct](https://pub.dev/packages/aqueduct)
+
 ## 3.3.0-b1
 
 - Adds 'aqueduct build' command that generates an executable binary of an Aqueduct app, with some known issues
@@ -70,7 +84,7 @@
 - `Query.where` behavior has changed to consistently use property selector syntax.
     - Removes methods like `whereEqualTo` and replaced with `QueryExpression`.
 - `Controller.generate` renamed to `Controller.link`. Removed `Controller.pipe`.
-- `package:aqueduct/test` moved to `package:aqueduct_test/aqueduct_test`, which is a separate dependency from `aqueduct`.
+- `package:aqueduct_2/test` moved to `package:aqueduct_test/aqueduct_test`, which is a separate dependency from `aqueduct`.
 - Renames methods in `AuthDelegate` to provide consistency.
 - Removes `ManagedContext.defaultContext`; context usage must be explicit.
 - Removes `HTTPResponseException`. Responses can now be thrown instead.
@@ -137,7 +151,7 @@
 - Adds `whereNot` to apply an inverse to other `Query.where` expression, e.g. `whereNot(whereIn(["a", "b"]))`.
 - Fixes bug where subclassing `ManagedObjectController` didn't work.
 - Renames `ResourceRegistry` to `ServiceRegistry`.
-- Improves feedback and interface for `package:aqueduct/test.dart`.
+- Improves feedback and interface for `package:aqueduct_2/test.dart`.
 
 ## 2.3.0
 

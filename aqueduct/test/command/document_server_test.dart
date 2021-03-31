@@ -2,7 +2,7 @@
 @Tags(const ["cli"])
 import 'dart:io';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,22 +35,16 @@ void main() {
     final task = projectUnderTestCli.start("document", ["serve"]);
     await task.hasStarted;
 
-    expect(
-        Directory.fromUri(
-                projectUnderTestCli.agent.workingDirectory.uri.resolve(".aqueduct_spec/"))
-            .existsSync(),
+    expect(Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve(".aqueduct_spec/")).existsSync(),
         true);
 
-    var response = await http.get("http://localhost:8111");
+    var response = await http.get(Uri.parse('http://localhost:8111'));
     expect(response.body, contains("redoc spec-url='openapi.json'"));
 
     // ignore: unawaited_futures
     task.process.stop(0);
     expect(await task.exitCode, 0);
-    expect(
-        Directory.fromUri(
-          projectUnderTestCli.agent.workingDirectory.uri.resolve(".aqueduct_spec/"))
-            .existsSync(),
+    expect(Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve(".aqueduct_spec/")).existsSync(),
         false);
   });
 }

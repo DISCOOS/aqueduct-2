@@ -1,45 +1,37 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/metadata.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:aqueduct/src/db/persistent_store/persistent_store.dart';
-import 'package:aqueduct/src/db/postgresql/postgresql_persistent_store.dart';
-import 'package:safe_config/safe_config.dart';
-import 'package:aqueduct/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/metadata.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
+import 'package:aqueduct_2/src/db/persistent_store/persistent_store.dart';
+import 'package:aqueduct_2/src/db/postgresql/postgresql_persistent_store.dart';
+import 'package:safe_config_2/safe_config_2.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
 
 abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   static const String flavorPostgreSQL = "postgres";
 
   DatabaseConfiguration connectedDatabase;
 
-  @Flag("use-ssl",
-      help: "Whether or not the database connection should use SSL",
-      defaultsTo: false)
+  @Flag("use-ssl", help: "Whether or not the database connection should use SSL", defaultsTo: false)
   bool get useSSL => decode("use-ssl");
 
   @Option("connect",
       abbr: "c",
-      help:
-          "A database connection URI string. If this option is set, database-config is ignored.",
+      help: "A database connection URI string. If this option is set, database-config is ignored.",
       valueHelp: "postgres://user:password@localhost:port/databaseName")
   String get databaseConnectionString => decode("connect");
 
   @Option("flavor",
-      abbr: "f",
-      help: "The database driver flavor to use.",
-      defaultsTo: "postgres",
-      allowed: ["postgres"])
+      abbr: "f", help: "The database driver flavor to use.", defaultsTo: "postgres", allowed: ["postgres"])
   String get databaseFlavor => decode("flavor");
 
   @Option("database-config",
-      help:
-          "A configuration file that provides connection information for the database. "
+      help: "A configuration file that provides connection information for the database. "
           "Paths are relative to project directory. If the connect option is set, this value is ignored. "
           "See 'aqueduct db -h' for details.",
       defaultsTo: "database.yaml")
-  File get databaseConfigurationFile =>
-      fileInProjectDirectory(decode("database-config"));
+  File get databaseConfigurationFile => fileInProjectDirectory(decode("database-config"));
 
   PersistentStore _persistentStore;
 
@@ -65,17 +57,15 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
         }
       } else {
         if (!databaseConfigurationFile.existsSync()) {
-          throw CLIException("No database configuration file found.",
-              instructions: [
-                "Expected file at: ${databaseConfigurationFile.path}.",
-                "See --connect and --database-config. If not using --connect, "
-                    "this tool expects a YAML configuration file with the following format:\n$_dbConfigFormat"
-              ]);
+          throw CLIException("No database configuration file found.", instructions: [
+            "Expected file at: ${databaseConfigurationFile.path}.",
+            "See --connect and --database-config. If not using --connect, "
+                "this tool expects a YAML configuration file with the following format:\n$_dbConfigFormat"
+          ]);
         }
 
         try {
-          connectedDatabase =
-              DatabaseConfiguration.fromFile(databaseConfigurationFile);
+          connectedDatabase = DatabaseConfiguration.fromFile(databaseConfigurationFile);
         } catch (_) {
           throw CLIException("Invalid database configuration.", instructions: [
             "File located at ${databaseConfigurationFile.path}.",
@@ -85,12 +75,8 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
         }
       }
 
-      return _persistentStore = PostgreSQLPersistentStore(
-          connectedDatabase.username,
-          connectedDatabase.password,
-          connectedDatabase.host,
-          connectedDatabase.port,
-          connectedDatabase.databaseName,
+      return _persistentStore = PostgreSQLPersistentStore(connectedDatabase.username, connectedDatabase.password,
+          connectedDatabase.host, connectedDatabase.port, connectedDatabase.databaseName,
           useSSL: useSSL);
     }
 

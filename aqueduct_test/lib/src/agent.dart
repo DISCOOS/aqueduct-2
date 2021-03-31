@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 import 'harness.dart';
 import 'matchers.dart';
@@ -15,7 +15,7 @@ part 'response.dart';
 /// Executes HTTP requests during application testing.
 ///
 /// Agents create and execute test requests. For most cases, methods like [get], [post], [put] and [delete]
-/// are used to execute these requests. For more granular control, [request] creates a request object
+/// are used to execute these requests. For more granular controluest] creates a request object
 /// that can be configured in more detail.
 ///
 /// Each [Agent] has a set of default values, such as headers, that it uses for each of its requests.
@@ -30,7 +30,7 @@ part 'response.dart';
 ///           final harness = TestHarness<MyChannel>()..install();
 ///
 ///           test("GET /thing returns 200", () async {
-///             final resp = await harness.agent.get("/thing");
+///             final resp = await harness.agent.get(Uri.parse('/thing'));
 ///             expect(resp, hasStatus(200));
 ///           });
 ///         }
@@ -107,8 +107,7 @@ class Agent {
   /// Base-64 encodes username and password with a colon separator, and sets it
   /// for the key 'authorization' in [headers].
   void setBasicAuthorization(String username, String password) {
-    headers["authorization"] =
-        "Basic ${base64.encode("$username:${password ?? ""}".codeUnits)}";
+    headers["authorization"] = "Basic ${base64.encode("$username:${password ?? ""}".codeUnits)}";
   }
 
   /// Adds bearer authorization to requests from this agent.
@@ -120,8 +119,7 @@ class Agent {
 
   /// Adds Accept header to requests from this agent.
   set accept(List<ContentType> contentTypes) {
-    headers[HttpHeaders.acceptHeader] =
-        contentTypes.map((ct) => ct.toString()).join(",");
+    headers[HttpHeaders.acceptHeader] = contentTypes.map((ct) => ct.toString()).join(",");
   }
 
   /// Creates a request object for [path] that can be configured and executed later.
@@ -134,7 +132,6 @@ class Agent {
     final r = TestRequest._(_client)
       ..baseURL = baseURL
       ..path = path
-      .._client = _client
       ..contentType = contentType;
 
     r.headers.addAll(headers);
@@ -150,38 +147,28 @@ class Agent {
   /// Makes a GET request with this agent.
   ///
   /// Calls [execute] with "GET" method.
-  Future<TestResponse> get(String path,
-      {Map<String, dynamic> headers, Map<String, dynamic> query}) {
+  Future<TestResponse> get(String path, {Map<String, dynamic> headers, Map<String, dynamic> query}) {
     return execute("GET", path, headers: headers, query: query);
   }
 
   /// Makes a POST request with this agent.
   ///
   /// Calls [execute] with "POST" method.
-  Future<TestResponse> post(String path,
-      {dynamic body,
-      Map<String, dynamic> headers,
-      Map<String, dynamic> query}) {
+  Future<TestResponse> post(String path, {dynamic body, Map<String, dynamic> headers, Map<String, dynamic> query}) {
     return execute("POST", path, body: body, headers: headers, query: query);
   }
 
   /// Makes a DELETE request with this agent.
   ///
   /// Calls [execute] with "DELETE" method.
-  Future<TestResponse> delete(String path,
-      {dynamic body,
-      Map<String, dynamic> headers,
-      Map<String, dynamic> query}) {
+  Future<TestResponse> delete(String path, {dynamic body, Map<String, dynamic> headers, Map<String, dynamic> query}) {
     return execute("DELETE", path, body: body, headers: headers, query: query);
   }
 
   /// Makes a PUT request with this agent.
   ///
   /// Calls [execute] with "PUT" method.
-  Future<TestResponse> put(String path,
-      {dynamic body,
-      Map<String, dynamic> headers,
-      Map<String, dynamic> query}) {
+  Future<TestResponse> put(String path, {dynamic body, Map<String, dynamic> headers, Map<String, dynamic> query}) {
     return execute("PUT", path, body: body, headers: headers, query: query);
   }
 
@@ -199,9 +186,7 @@ class Agent {
   ///
   /// If [query] is non-null, each value is URI-encoded and then the map is encoding as the request URI's  query string.
   Future<TestResponse> execute(String method, String path,
-      {dynamic body,
-      Map<String, dynamic> headers,
-      Map<String, dynamic> query}) {
+      {dynamic body, Map<String, dynamic> headers, Map<String, dynamic> query}) {
     final req = request(path)
       ..body = body
       ..query = query;

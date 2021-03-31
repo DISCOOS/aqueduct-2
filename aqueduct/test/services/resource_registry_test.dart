@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 void main() {
   test("Can add resources to registry that get shut down", () async {
     var controller = StreamController();
-    ServiceRegistry.defaultInstance
-        .register<StreamController>(controller, (s) => s.close());
+    ServiceRegistry.defaultInstance.register<StreamController>(controller, (s) => s.close());
 
     var msgCompleter = Completer();
     controller.stream.listen((msg) {
@@ -23,8 +22,7 @@ void main() {
 
   test("Can remove resource", () async {
     var controller = StreamController();
-    ServiceRegistry.defaultInstance
-        .register<StreamController>(controller, (s) => s.close());
+    ServiceRegistry.defaultInstance.register<StreamController>(controller, (s) => s.close());
 
     var msgCompleter = Completer();
     controller.stream.listen((msg) {

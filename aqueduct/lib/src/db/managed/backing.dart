@@ -1,5 +1,5 @@
-import 'package:aqueduct/src/db/managed/key_path.dart';
-import 'package:aqueduct/src/db/managed/relationship_type.dart';
+import 'package:aqueduct_2/src/db/managed/key_path.dart';
+import 'package:aqueduct_2/src/db/managed/relationship_type.dart';
 
 import 'exception.dart';
 import 'managed.dart';

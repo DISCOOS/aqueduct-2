@@ -1,5 +1,5 @@
-import 'package:aqueduct/src/openapi/openapi.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 import 'http.dart';
 
@@ -42,10 +42,7 @@ abstract class Serializable {
   ///     var user = User()
   ///       ..read(values, ignore: ["id"]);
   void read(Map<String, dynamic> object,
-      {Iterable<String> accept,
-      Iterable<String> ignore,
-      Iterable<String> reject,
-      Iterable<String> require}) {
+      {Iterable<String> accept, Iterable<String> ignore, Iterable<String> reject, Iterable<String> require}) {
     if (accept == null && ignore == null && reject == null && require == null) {
       readFromMap(object);
       return;
@@ -57,16 +54,14 @@ abstract class Serializable {
       if (reject?.contains(key) ?? false) {
         throw SerializableException(["invalid input key '$key'"]);
       }
-      if ((ignore?.contains(key) ?? false) ||
-          !(accept?.contains(key) ?? true)) {
+      if ((ignore?.contains(key) ?? false) || !(accept?.contains(key) ?? true)) {
         copy.remove(key);
       }
       stillRequired?.remove(key);
     });
 
     if (stillRequired?.isNotEmpty ?? false) {
-      throw SerializableException(
-          ["missing required input key(s): '${stillRequired.join(", ")}'"]);
+      throw SerializableException(["missing required input key(s): '${stillRequired.join(", ")}'"]);
     }
 
     readFromMap(copy);
@@ -97,10 +92,7 @@ class SerializableException implements HandlerException {
 
   @override
   Response get response {
-    return Response.badRequest(body: {
-      "error": "entity validation failed",
-      "reasons": reasons ?? "undefined"
-    });
+    return Response.badRequest(body: {"error": "entity validation failed", "reasons": reasons ?? "undefined"});
   }
 
   @override

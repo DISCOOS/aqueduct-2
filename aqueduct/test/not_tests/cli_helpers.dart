@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/cli/runner.dart';
-import 'package:aqueduct/src/cli/running_process.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/cli/runner.dart';
+import 'package:aqueduct_2/src/cli/running_process.dart';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 class CLIClient {
   CLIClient(this.agent);
@@ -19,6 +19,7 @@ class CLIClient {
 
     throw StateError("is not a project terminal");
   }
+
   List<String> defaultArgs;
 
   String get output {
@@ -69,23 +70,18 @@ class CLIClient {
     _output.clear();
   }
 
-  Future<CLIClient> createProject(
-      {String name = "application_test",
-      String template,
-      bool offline = true}) async {
+  Future<CLIClient> createProject({String name = "application_test", String template, bool offline = true}) async {
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
-        "aqueduct" : {
-          "path": "../.."
-        }
+        "aqueduct": {"path": "../.."}
       }, devDependencies: {
         "test": "^1.0.0"
       }));
-      
+
       client.projectAgent.addLibraryFile("channel", """
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 import '$name.dart';
 
@@ -102,10 +98,10 @@ class TestChannel extends ApplicationChannel {
   }
 }
   """);
-      
+
       return client;
     }
-    
+
     try {
       ProjectAgent.projectsDirectory.createSync();
     } catch (_) {}
@@ -127,11 +123,8 @@ class TestChannel extends ApplicationChannel {
     return CLIClient(ProjectAgent.existing(ProjectAgent.projectsDirectory.uri.resolve("$name/")));
   }
 
-  Future<int> executeMigrations(
-      {String connectString =
-          "postgres://dart:dart@localhost:5432/dart_test"}) async {
-    final res =
-        await run("db", ["upgrade", "--connect", connectString]);
+  Future<int> executeMigrations({String connectString = "postgres://dart:dart@localhost:5432/dart_test"}) async {
+    final res = await run("db", ["upgrade", "--connect", connectString]);
     if (res != 0) {
       print("executeMigrations failed: $output");
     }
@@ -143,18 +136,14 @@ class TestChannel extends ApplicationChannel {
       defaultMigrationDirectory.createSync();
     } catch (_) {}
 
-    final currentNumberOfMigrations = defaultMigrationDirectory
-        .listSync()
-        .where((e) => e.path.endsWith("migration.dart"))
-        .length;
+    final currentNumberOfMigrations =
+        defaultMigrationDirectory.listSync().where((e) => e.path.endsWith("migration.dart")).length;
 
     final files = <File>[];
     for (var i = 1; i < schemas.length; i++) {
-      var source =
-          Migration.sourceForSchemaUpgrade(schemas[i - 1], schemas[i], i);
+      var source = Migration.sourceForSchemaUpgrade(schemas[i - 1], schemas[i], i);
 
-      var file = File.fromUri(defaultMigrationDirectory.uri
-          .resolve("${i + currentNumberOfMigrations}.migration.dart"));
+      var file = File.fromUri(defaultMigrationDirectory.uri.resolve("${i + currentNumberOfMigrations}.migration.dart"));
       file.writeAsStringSync(source);
       files.add(file);
     }
@@ -209,8 +198,7 @@ class TestChannel extends ApplicationChannel {
         if (elapsed > 60000) {
           Directory.current = saved;
           t.cancel();
-          task._processStarted
-              .completeError(TimeoutException("Timed out after 30 seconds"));
+          task._processStarted.completeError(TimeoutException("Timed out after 30 seconds"));
         }
       }
     });

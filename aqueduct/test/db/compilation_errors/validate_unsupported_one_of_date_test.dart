@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 class UnsupportedDateOneOf extends ManagedObject<_UDAOO> {}
 

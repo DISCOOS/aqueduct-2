@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:aqueduct/src/cli/commands/auth.dart';
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/commands/build.dart';
-import 'package:aqueduct/src/cli/commands/create.dart';
-import 'package:aqueduct/src/cli/commands/db.dart';
-import 'package:aqueduct/src/cli/commands/document.dart';
-import 'package:aqueduct/src/cli/commands/serve.dart';
-import 'package:aqueduct/src/cli/commands/setup.dart';
+import 'package:aqueduct_2/src/cli/commands/auth.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/commands/build.dart';
+import 'package:aqueduct_2/src/cli/commands/create.dart';
+import 'package:aqueduct_2/src/cli/commands/db.dart';
+import 'package:aqueduct_2/src/cli/commands/document.dart';
+import 'package:aqueduct_2/src/cli/commands/serve.dart';
+import 'package:aqueduct_2/src/cli/commands/setup.dart';
 
 class Runner extends CLICommand {
   Runner() {

@@ -15,22 +15,17 @@ class AuthClient {
   ///
   /// If this client supports scopes, [allowedScopes] must contain a list of scopes that tokens may request when authorized
   /// by this client.
-  AuthClient(String id, String hashedSecret, String salt,
-      {List<AuthScope> allowedScopes})
-      : this.withRedirectURI(id, hashedSecret, salt, null,
-            allowedScopes: allowedScopes);
+  AuthClient(String id, String hashedSecret, String salt, {List<AuthScope> allowedScopes})
+      : this.withRedirectURI(id, hashedSecret, salt, null, allowedScopes: allowedScopes);
 
   /// Creates an instance of a public [AuthClient].
   AuthClient.public(String id, {List<AuthScope> allowedScopes})
-      : this.withRedirectURI(id, null, null, null,
-            allowedScopes: allowedScopes);
+      : this.withRedirectURI(id, null, null, null, allowedScopes: allowedScopes);
 
   /// Creates an instance of [AuthClient] that uses the authorization code grant flow.
   ///
   /// All values must be non-null. This is confidential client.
-  AuthClient.withRedirectURI(
-      this.id, this.hashedSecret, this.salt, this.redirectURI,
-      {List<AuthScope> allowedScopes}) {
+  AuthClient.withRedirectURI(this.id, this.hashedSecret, this.salt, this.redirectURI, {List<AuthScope> allowedScopes}) {
     this.allowedScopes = allowedScopes;
   }
 
@@ -62,8 +57,7 @@ class AuthClient {
   List<AuthScope> get allowedScopes => _allowedScopes;
   set allowedScopes(List<AuthScope> scopes) {
     _allowedScopes = scopes?.where((s) {
-      return !scopes.any((otherScope) =>
-          s.isSubsetOrEqualTo(otherScope) && !s.isExactlyScope(otherScope));
+      return !scopes.any((otherScope) => s.isSubsetOrEqualTo(otherScope) && !s.isExactlyScope(otherScope));
     })?.toList();
   }
 
@@ -75,9 +69,7 @@ class AuthClient {
 
   /// Whether or not this client can issue tokens for the provided [scope].
   bool allowsScope(AuthScope scope) {
-    return allowedScopes
-            ?.any((clientScope) => scope.isSubsetOrEqualTo(clientScope)) ??
-        false;
+    return allowedScopes?.any((clientScope) => scope.isSubsetOrEqualTo(clientScope)) ?? false;
   }
 
   /// Whether or not this is a public or confidential client.
@@ -104,7 +96,7 @@ class AuthClient {
 /// [AuthServerDelegate] and [AuthServer] will exchange OAuth 2.0
 /// tokens through instances of this type.
 ///
-/// See the `package:aqueduct/managed_auth` library for a concrete implementation of this type.
+/// See the `package:aqueduct_2/managed_auth` library for a concrete implementation of this type.
 class AuthToken {
   /// The value to be passed as a Bearer Authorization header.
   String accessToken;
@@ -205,8 +197,7 @@ class AuthCode {
 /// about the validity of the credentials in a request.
 class Authorization {
   /// Creates an instance of a [Authorization].
-  Authorization(this.clientID, this.ownerID, this.validator,
-      {this.credentials, this.scopes});
+  Authorization(this.clientID, this.ownerID, this.validator, {this.credentials, this.scopes});
 
   /// The client ID the permission was granted under.
   final String clientID;
@@ -296,8 +287,7 @@ class AuthScope {
 
   factory AuthScope._parse(String scopeString) {
     if (scopeString?.isEmpty ?? true) {
-      throw FormatException(
-          "Invalid AuthScope. May not be null or empty string.", scopeString);
+      throw FormatException("Invalid AuthScope. May not be null or empty string.", scopeString);
     }
 
     for (var c in scopeString.codeUnits) {
@@ -321,24 +311,20 @@ class AuthScope {
   /// Signifies 'any' scope in [AuthServerDelegate.getAllowedScopes].
   ///
   /// See [AuthServerDelegate.getAllowedScopes] for more details.
-  static const List<AuthScope> any = [
-    AuthScope._("_scope:_constant:_marker", [], null)
-  ];
+  static const List<AuthScope> any = [AuthScope._("_scope:_constant:_marker", [], null)];
 
   /// Returns true if that [providedScopes] fulfills [requiredScopes].
   ///
   /// For all [requiredScopes], there must be a scope in [requiredScopes] that meets or exceeds
   /// that scope for this method to return true. If [requiredScopes] is null, this method
   /// return true regardless of [providedScopes].
-  static bool verify(
-      List<AuthScope> requiredScopes, List<AuthScope> providedScopes) {
+  static bool verify(List<AuthScope> requiredScopes, List<AuthScope> providedScopes) {
     if (requiredScopes == null) {
       return true;
     }
 
     return requiredScopes.every((requiredScope) {
-      final tokenHasValidScope = providedScopes
-          ?.any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
+      final tokenHasValidScope = providedScopes?.any((tokenScope) => requiredScope.isSubsetOrEqualTo(tokenScope));
 
       return tokenHasValidScope ?? false;
     });
@@ -363,37 +349,28 @@ class AuthScope {
 
   static List<_AuthScopeSegment> _parseSegments(String scopeString) {
     if (scopeString == null || scopeString == "") {
-      throw FormatException(
-          "Invalid AuthScope. May not be null or empty string.", scopeString);
+      throw FormatException("Invalid AuthScope. May not be null or empty string.", scopeString);
     }
 
-    final elements =
-        scopeString.split(":").map((seg) => _AuthScopeSegment(seg)).toList();
+    final elements = scopeString.split(":").map((seg) => _AuthScopeSegment(seg)).toList();
 
     var scannedOffset = 0;
     for (var i = 0; i < elements.length - 1; i++) {
       if (elements[i].modifier != null) {
         throw FormatException(
-            "Invalid AuthScope. May only contain modifiers on the last segment.",
-            scopeString,
-            scannedOffset);
+            "Invalid AuthScope. May only contain modifiers on the last segment.", scopeString, scannedOffset);
       }
 
       if (elements[i].name == "") {
-        throw FormatException(
-            "Invalid AuthScope. May not contain empty segments or, leading or trailing colons.",
-            scopeString,
-            scannedOffset);
+        throw FormatException("Invalid AuthScope. May not contain empty segments or, leading or trailing colons.",
+            scopeString, scannedOffset);
       }
 
       scannedOffset += elements[i].toString().length + 1;
     }
 
     if (elements.last.name == "") {
-      throw FormatException(
-          "Invalid AuthScope. May not contain empty segments.",
-          scopeString,
-          scannedOffset);
+      throw FormatException("Invalid AuthScope. May not contain empty segments.", scopeString, scannedOffset);
     }
 
     return elements;
@@ -463,8 +440,7 @@ class AuthScope {
         return false;
       }
 
-      if (incomingSegment.name != segment.name ||
-          incomingSegment.modifier != segment.modifier) {
+      if (incomingSegment.name != segment.name || incomingSegment.modifier != segment.modifier) {
         return false;
       }
     }

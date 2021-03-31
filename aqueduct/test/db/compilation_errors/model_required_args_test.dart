@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -13,8 +13,7 @@ void main() {
   });
 }
 
-class DefaultConstructorHasRequiredArgs
-    extends ManagedObject<_ConstructorTableDef> {
+class DefaultConstructorHasRequiredArgs extends ManagedObject<_ConstructorTableDef> {
   // ignore: avoid_unused_constructor_parameters
   DefaultConstructorHasRequiredArgs(int foo);
 }

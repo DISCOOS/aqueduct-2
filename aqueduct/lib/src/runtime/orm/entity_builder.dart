@@ -1,15 +1,15 @@
 import 'dart:mirrors';
 
-import 'package:aqueduct/src/runtime/orm/data_model_compiler.dart';
-import 'package:aqueduct/src/db/managed/attributes.dart';
-import 'package:aqueduct/src/db/managed/data_model.dart';
-import 'package:aqueduct/src/runtime/orm/entity_mirrors.dart';
-import 'package:aqueduct/src/db/managed/managed.dart';
-import 'package:aqueduct/src/db/managed/object.dart';
-import 'package:aqueduct/src/runtime/orm/property_builder.dart';
-import 'package:aqueduct/src/db/managed/relationship_type.dart';
-import 'package:aqueduct/src/runtime/orm_impl.dart';
-import 'package:aqueduct/src/utilities/mirror_helpers.dart';
+import 'package:aqueduct_2/src/runtime/orm/data_model_compiler.dart';
+import 'package:aqueduct_2/src/db/managed/attributes.dart';
+import 'package:aqueduct_2/src/db/managed/data_model.dart';
+import 'package:aqueduct_2/src/runtime/orm/entity_mirrors.dart';
+import 'package:aqueduct_2/src/db/managed/managed.dart';
+import 'package:aqueduct_2/src/db/managed/object.dart';
+import 'package:aqueduct_2/src/runtime/orm/property_builder.dart';
+import 'package:aqueduct_2/src/db/managed/relationship_type.dart';
+import 'package:aqueduct_2/src/runtime/orm_impl.dart';
+import 'package:aqueduct_2/src/utilities/mirror_helpers.dart';
 import 'package:logging/logging.dart';
 
 class EntityBuilder {

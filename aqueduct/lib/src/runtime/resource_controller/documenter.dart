@@ -1,15 +1,15 @@
 import 'dart:mirrors';
 
-import 'package:aqueduct/src/auth/objects.dart';
-import 'package:aqueduct/src/http/resource_controller.dart';
-import 'package:aqueduct/src/http/resource_controller_bindings.dart';
-import 'package:aqueduct/src/http/resource_controller_interfaces.dart';
-import 'package:aqueduct/src/http/serializable.dart';
-import 'package:aqueduct/src/openapi/documentable.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
-import 'package:aqueduct/src/runtime/impl.dart';
-import 'package:aqueduct/src/runtime/resource_controller_impl.dart';
-import 'package:aqueduct/src/utilities/mirror_helpers.dart';
+import 'package:aqueduct_2/src/auth/objects.dart';
+import 'package:aqueduct_2/src/http/resource_controller.dart';
+import 'package:aqueduct_2/src/http/resource_controller_bindings.dart';
+import 'package:aqueduct_2/src/http/resource_controller_interfaces.dart';
+import 'package:aqueduct_2/src/http/serializable.dart';
+import 'package:aqueduct_2/src/openapi/documentable.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/runtime/impl.dart';
+import 'package:aqueduct_2/src/runtime/resource_controller_impl.dart';
+import 'package:aqueduct_2/src/utilities/mirror_helpers.dart';
 
 bool isSerializable(Type type) {
   return reflectType(type).isSubtypeOf(reflectType(Serializable));

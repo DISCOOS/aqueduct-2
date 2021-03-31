@@ -1,7 +1,7 @@
 // ignore: unnecessary_const
 @Tags(const ["cli"])
 import 'dart:io';
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:test/test.dart';
 import '../not_tests/cli_helpers.dart';
 
@@ -19,7 +19,7 @@ void main() {
   setUp(() async {
     projectUnderTestCli = templateCli.replicate(Uri.parse("replica/"));
     projectUnderTestCli.projectAgent.addLibraryFile("application_test", """
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
     
 class TestObject extends ManagedObject<_TestObject> {}
 
@@ -31,7 +31,6 @@ class _TestObject {
 }
       """);
   });
-
 
   tearDown(() {
     projectUnderTestCli.delete();
@@ -52,12 +51,10 @@ class _TestObject {
     expect(projectUnderTestCli.defaultMigrationDirectory.existsSync(), true);
   });
 
-  test(
-      "If there are no migration files, create an initial one that validates to schema",
-      () async {
+  test("If there are no migration files, create an initial one that validates to schema", () async {
     // Putting a non-migration file in there to ensure that this doesn't prevent from being ugpraded
-        projectUnderTestCli.defaultMigrationDirectory.createSync();
-        projectUnderTestCli.agent.addOrReplaceFile("migrations/notmigration.dart", " ");
+    projectUnderTestCli.defaultMigrationDirectory.createSync();
+    projectUnderTestCli.agent.addOrReplaceFile("migrations/notmigration.dart", " ");
 
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
@@ -67,17 +64,14 @@ class _TestObject {
     expect(res, 0);
   });
 
-  test(
-      "If there is already a migration file, create an upgrade file with changes",
-      () async {
+  test("If there is already a migration file, create an upgrade file with changes", () async {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
     projectUnderTestCli.clearOutput();
 
     // Let's add an index
     projectUnderTestCli.agent.modifyFile("lib/application_test.dart", (prev) {
-      return prev.replaceFirst(
-          "String foo;", "@Column(indexed: true) String foo;");
+      return prev.replaceFirst("String foo;", "@Column(indexed: true) String foo;");
     });
 
     res = await projectUnderTestCli.run("db", ["generate"]);
@@ -90,13 +84,11 @@ class _TestObject {
             .where((fse) => !fse.uri.pathSegments.last.startsWith(".")),
         hasLength(2));
     expect(
-        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri
-                .resolve("00000001_initial.migration.dart"))
+        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri.resolve("00000001_initial.migration.dart"))
             .existsSync(),
         true);
     expect(
-        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri
-                .resolve("00000002_unnamed.migration.dart"))
+        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri.resolve("00000002_unnamed.migration.dart"))
             .existsSync(),
         true);
 
@@ -111,8 +103,7 @@ class _TestObject {
 
     // Let's add an index
     projectUnderTestCli.agent.modifyFile("lib/application_test.dart", (prev) {
-      return prev.replaceFirst(
-          "String foo;", "@Column(indexed: true) String foo;");
+      return prev.replaceFirst("String foo;", "@Column(indexed: true) String foo;");
     });
 
     res = await projectUnderTestCli.run("db", ["generate", "--name", "add_index"]);
@@ -120,7 +111,7 @@ class _TestObject {
     projectUnderTestCli.clearOutput();
 
     expect(
-      projectUnderTestCli.defaultMigrationDirectory
+        projectUnderTestCli.defaultMigrationDirectory
             .listSync()
             .where((fse) => !fse.uri.pathSegments.last.startsWith(".")),
         hasLength(2));
@@ -130,8 +121,7 @@ class _TestObject {
             .existsSync(),
         true);
     expect(
-        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri
-                .resolve("00000002_add_index.migration.dart"))
+        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri.resolve("00000002_add_index.migration.dart"))
             .existsSync(),
         true);
 
@@ -139,39 +129,26 @@ class _TestObject {
     expect(res, 0);
   });
 
-  test("Can specify migration directory other than default, relative path",
-      () async {
-    var res = await projectUnderTestCli.run(
-        "db", ["generate", "--migration-directory", "foobar"]);
+  test("Can specify migration directory other than default, relative path", () async {
+    var res = await projectUnderTestCli.run("db", ["generate", "--migration-directory", "foobar"]);
     expect(res, 0);
 
-    final migDir =
-        Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve("foobar/"));
+    final migDir = Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve("foobar/"));
     final files = migDir.listSync();
-    expect(
-        files.any((fse) => fse is File && fse.path.endsWith("migration.dart")),
-        true);
+    expect(files.any((fse) => fse is File && fse.path.endsWith("migration.dart")), true);
   });
 
-  test("Can specify migration directory other than default, absolute path",
-      () async {
-    final migDir =
-        Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve("foobar/"));
-    var res = await projectUnderTestCli.run("db", [
-      "generate",
-      "--migration-directory",
-      migDir.uri.toFilePath(windows: Platform.isWindows)
-    ]);
+  test("Can specify migration directory other than default, absolute path", () async {
+    final migDir = Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri.resolve("foobar/"));
+    var res = await projectUnderTestCli
+        .run("db", ["generate", "--migration-directory", migDir.uri.toFilePath(windows: Platform.isWindows)]);
     expect(res, 0);
 
     final files = migDir.listSync();
-    expect(
-        files.any((fse) => fse is File && fse.path.endsWith("migration.dart")),
-        true);
+    expect(files.any((fse) => fse is File && fse.path.endsWith("migration.dart")), true);
   });
 
-  test("If migration file requires additional input, send message to user",
-      () async {
+  test("If migration file requires additional input, send message to user", () async {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
     projectUnderTestCli.clearOutput();

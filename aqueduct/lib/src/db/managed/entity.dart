@@ -1,8 +1,8 @@
-import 'package:aqueduct/src/db/managed/backing.dart';
-import 'package:aqueduct/src/db/managed/key_path.dart';
-import 'package:aqueduct/src/openapi/documentable.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/src/db/managed/backing.dart';
+import 'package:aqueduct_2/src/db/managed/key_path.dart';
+import 'package:aqueduct_2/src/openapi/documentable.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
+import 'package:runtime_2/runtime_2.dart';
 
 import '../query/query.dart';
 import 'managed.dart';
@@ -45,8 +45,7 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// If running in default mode (mirrors enabled), is a set of mirror operations. Otherwise,
   /// code generated.
-  ManagedEntityRuntime get runtime =>
-      RuntimeContext.current[instanceType] as ManagedEntityRuntime;
+  ManagedEntityRuntime get runtime => RuntimeContext.current[instanceType] as ManagedEntityRuntime;
 
   /// The name of type of persistent instances represented by this entity.
   ///
@@ -117,9 +116,8 @@ class ManagedEntity implements APIComponentDocumenter {
           .map((prop) => prop.name));
 
       elements.addAll(relationships.values
-          .where((prop) =>
-              prop.isIncludedInDefaultResultSet &&
-              prop.relationshipType == ManagedRelationshipType.belongsTo)
+          .where(
+              (prop) => prop.isIncludedInDefaultResultSet && prop.relationshipType == ManagedRelationshipType.belongsTo)
           .map((prop) => prop.name));
       _defaultProperties = List.unmodifiable(elements);
     }
@@ -168,8 +166,7 @@ class ManagedEntity implements APIComponentDocumenter {
   /// If [backing] is non-null, it will be the backing map of the returned object.
   T instanceOf<T extends ManagedObject>({ManagedBacking backing}) {
     if (backing != null) {
-      return (runtime.instanceOfImplementation(backing: backing)..entity = this)
-          as T;
+      return (runtime.instanceOfImplementation(backing: backing)..entity = this) as T;
     }
     return (runtime.instanceOfImplementation()..entity = this) as T;
   }
@@ -182,37 +179,31 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single attribute
   /// on this entity was selected. Returns that attribute.
-  ManagedAttributeDescription identifyAttribute<T, U extends ManagedObject>(
-      T propertyIdentifier(U x)) {
+  ManagedAttributeDescription identifyAttribute<T, U extends ManagedObject>(T propertyIdentifier(U x)) {
     final keyPaths = identifyProperties(propertyIdentifier);
     if (keyPaths.length != 1) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot access more than one property for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot access more than one property for this operation.");
     }
 
     final firstKeyPath = keyPaths.first;
     if (firstKeyPath.dynamicElements != null) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot access subdocuments for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot access subdocuments for this operation.");
     }
 
     final elements = firstKeyPath.path;
     if (elements.length > 1) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot use relationships for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot use relationships for this operation.");
     }
 
     final propertyName = elements.first.name;
     var attribute = attributes[propertyName];
     if (attribute == null) {
       if (relationships.containsKey(propertyName)) {
-        throw ArgumentError(
-            "Invalid property selection. Property '$propertyName' on "
+        throw ArgumentError("Invalid property selection. Property '$propertyName' on "
             "'$name' "
             "is a relationship and cannot be selected for this operation.");
       } else {
-        throw ArgumentError(
-            "Invalid property selection. Column '$propertyName' does not "
+        throw ArgumentError("Invalid property selection. Column '$propertyName' does not "
             "exist on table '$tableName'.");
       }
     }
@@ -224,25 +215,20 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single relationship
   /// on this entity was selected. Returns that relationship.
-  ManagedRelationshipDescription
-      identifyRelationship<T, U extends ManagedObject>(
-          T propertyIdentifier(U x)) {
+  ManagedRelationshipDescription identifyRelationship<T, U extends ManagedObject>(T propertyIdentifier(U x)) {
     final keyPaths = identifyProperties(propertyIdentifier);
     if (keyPaths.length != 1) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot access more than one property for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot access more than one property for this operation.");
     }
 
     final firstKeyPath = keyPaths.first;
     if (firstKeyPath.dynamicElements != null) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot access subdocuments for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot access subdocuments for this operation.");
     }
 
     final elements = firstKeyPath.path;
     if (elements.length > 1) {
-      throw ArgumentError(
-          "Invalid property selector. Cannot identify a nested relationship for this operation.");
+      throw ArgumentError("Invalid property selector. Cannot identify a nested relationship for this operation.");
     }
 
     final propertyName = elements.first.name;
@@ -259,12 +245,10 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single property
   /// on this entity was selected. Returns that property.
-  KeyPath identifyProperty<T, U extends ManagedObject>(
-      T propertyIdentifier(U x)) {
+  KeyPath identifyProperty<T, U extends ManagedObject>(T propertyIdentifier(U x)) {
     final properties = identifyProperties(propertyIdentifier);
     if (properties.length != 1) {
-      throw ArgumentError(
-          "Invalid property selector. Must reference a single property only.");
+      throw ArgumentError("Invalid property selector. Must reference a single property only.");
     }
 
     return properties.first;
@@ -274,8 +258,7 @@ class ManagedEntity implements APIComponentDocumenter {
   ///
   /// Each selected property in [propertiesIdentifier] is returned in a [KeyPath] object that fully identifies the
   /// property relative to this entity.
-  List<KeyPath> identifyProperties<T, U extends ManagedObject>(
-      T propertiesIdentifier(U x)) {
+  List<KeyPath> identifyProperties<T, U extends ManagedObject>(T propertiesIdentifier(U x)) {
     final tracker = ManagedAccessTrackingBacking();
     var obj = instanceOf<U>(backing: tracker);
     propertiesIdentifier(obj);
@@ -290,16 +273,13 @@ class ManagedEntity implements APIComponentDocumenter {
     final buffer = StringBuffer();
     if (uniquePropertySet != null) {
       final propString = uniquePropertySet.map((s) => "'${s.name}'").join(", ");
-      buffer.writeln(
-          "No two objects may have the same value for all of: $propString.");
+      buffer.writeln("No two objects may have the same value for all of: $propString.");
     }
 
     obj.description = buffer.toString();
 
     properties.forEach((name, def) {
-      if (def is ManagedAttributeDescription &&
-          !def.isIncludedInDefaultResultSet &&
-          !def.isTransient) {
+      if (def is ManagedAttributeDescription && !def.isIncludedInDefaultResultSet && !def.isTransient) {
         return;
       }
 
@@ -360,6 +340,5 @@ abstract class ManagedEntityRuntime {
 
   String getPropertyName(Invocation invocation, ManagedEntity entity);
 
-  dynamic dynamicConvertFromPrimitiveValue(
-      ManagedPropertyDescription property, dynamic value);
+  dynamic dynamicConvertFromPrimitiveValue(ManagedPropertyDescription property, dynamic value);
 }

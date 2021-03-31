@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 
 import 'http.dart';
 import 'route_node.dart';
@@ -22,9 +22,7 @@ class Router extends Controller {
   /// Creates a new [Router].
   Router({String basePath, Future notFoundHandler(Request request)})
       : _unmatchedController = notFoundHandler,
-        _basePathSegments =
-            basePath?.split("/")?.where((str) => str.isNotEmpty)?.toList() ??
-                [] {
+        _basePathSegments = basePath?.split("/")?.where((str) => str.isNotEmpty)?.toList() ?? [] {
     policy.allowCredentials = false;
   }
 
@@ -48,7 +46,7 @@ class Router extends Controller {
   /// Routers allow for multiple linked controllers. A request that matches [pattern]
   /// will be sent to the controller linked to this method's return value.
   ///
-  /// The [pattern] must follow the rules of route patterns (see also http://aqueduct.io/docs/http/routing/).
+  /// The [pattern] must follow the rules of route patterns (see also http://discoos.github.io/aqueduct-2/docs/http/routing/).
   ///
   /// A pattern consists of one or more path segments, e.g. "/path" or "/path/to".
   ///
@@ -73,16 +71,14 @@ class Router extends Controller {
   ///         /files/*
   ///
   Linkable route(String pattern) {
-    var routeController = _RouteController(
-        RouteSpecification.specificationsForRoutePattern(pattern));
+    var routeController = _RouteController(RouteSpecification.specificationsForRoutePattern(pattern));
     _routeControllers.add(routeController);
     return routeController;
   }
 
   @override
   void didAddToChannel() {
-    _root.node =
-        RouteNode(_routeControllers.expand((rh) => rh.specifications).toList());
+    _root.node = RouteNode(_routeControllers.expand((rh) => rh.specifications).toList());
 
     for (var c in _routeControllers) {
       c.didAddToChannel();
@@ -92,14 +88,12 @@ class Router extends Controller {
   /// Routers override this method to throw an exception. Use [route] instead.
   @override
   Linkable link(Controller generatorFunction()) {
-    throw ArgumentError(
-        "Invalid link. 'Router' cannot directly link to controllers. Use 'route'.");
+    throw ArgumentError("Invalid link. 'Router' cannot directly link to controllers. Use 'route'.");
   }
 
   @override
   Linkable linkFunction(FutureOr<RequestOrResponse> handle(Request request)) {
-    throw ArgumentError(
-        "Invalid link. 'Router' cannot directly link to functions. Use 'route'.");
+    throw ArgumentError("Invalid link. 'Router' cannot directly link to functions. Use 'route'.");
   }
 
   @override
@@ -120,14 +114,12 @@ class Router extends Controller {
         }
       }
 
-      final node =
-          _root.node.nodeForPathSegments(requestURISegmentIterator, req.path);
+      final node = _root.node.nodeForPathSegments(requestURISegmentIterator, req.path);
       if (node?.specification == null) {
         await _handleUnhandledRequest(req);
         return null;
       }
-      req.path.setSpecification(node.specification,
-          segmentOffset: _basePathSegments.length);
+      req.path.setSpecification(node.specification, segmentOffset: _basePathSegments.length);
 
       next = node.controller;
     } catch (any, stack) {
@@ -210,19 +202,14 @@ class _RouteController extends Controller {
       }).join("/");
       final pathKey = "/$elements";
 
-      final path = APIPath()
-        ..parameters = spec.variableNames
-            .map((pathVar) => APIParameter.path(pathVar))
-            .toList();
+      final path = APIPath()..parameters = spec.variableNames.map((pathVar) => APIParameter.path(pathVar)).toList();
 
       if (spec.segments.any((seg) => seg.isRemainingMatcher)) {
-        path.parameters.add(APIParameter.path("path")
-          ..description =
-              "This path variable may contain slashes '/' and may be empty.");
+        path.parameters.add(
+            APIParameter.path("path")..description = "This path variable may contain slashes '/' and may be empty.");
       }
 
-      path.operations =
-          spec.controller.documentOperations(components, pathKey, path);
+      path.operations = spec.controller.documentOperations(components, pathKey, path);
 
       pathMap[pathKey] = path;
 

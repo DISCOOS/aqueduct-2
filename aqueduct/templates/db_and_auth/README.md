@@ -2,7 +2,7 @@
 
 ## Database
 
-You will need a local database for testing, and another database for running the application locally. The behavior and configuration of these databases are documented here: http://aqueduct.io/docs/testing/mixins/.
+You will need a local database for testing, and another database for running the application locally. The behavior and configuration of these databases are documented here: http://discoos.github.io/aqueduct-2/docs/testing/mixins/.
 
 To run tests, you must have a configuration file named `config.src.yaml`. By default, it is configured to connect your application to a database named `dart_test` (documented in the link above) and should not need to be edited. Tables are automatically created and deleted during test execution.
 
@@ -10,8 +10,8 @@ To run your application locally, you must have a `config.yaml` file that has cor
 When running locally, you must apply database migrations to your database before using it. The following commands generate a migration file from your project and then apply it to a database. Replace your database's connection details with the details below.
 
 ```
-aqueduct db generate
-aqueduct db upgrade --connect postgres://dart:dart@localhost:5432/wildfire
+aqueduct_2 db generate
+aqueduct_2 db upgrade --connect postgres://dart:dart@localhost:5432/wildfire
 ```
 
 ### Configure OAuth
@@ -19,16 +19,16 @@ aqueduct db upgrade --connect postgres://dart:dart@localhost:5432/wildfire
 To run your application locally, you must also register OAuth 2.0 clients in the application database. Use the same database credentials after you have applied the migration.
 
 ```
-aqueduct auth add-client --id com.local.test \
+aqueduct_2 auth add-client --id com.local.test \
     --secret mysecret \
     --connect postgres://user:password@localhost:5432/wildfire
 ```
 
-To run your tests with OAuth 2.0 client identifiers, see this documentation: http://aqueduct.io/docs/testing/mixins/#testing-applications-that-use-oauth-20.
+To run your tests with OAuth 2.0 client identifiers, see this documentation: http://discoos.github.io/aqueduct-2/docs/testing/mixins/#testing-applications-that-use-oauth-20.
 
 ## Running the server locally
 
-Run `aqueduct serve` from this directory to run the application. For running within an IDE, run `bin/main.dart`.
+Run `aqueduct_2 serve` from this directory to run the application. For running within an IDE, run `bin/main.dart`.
 
 ## Running CURL commands to test the end points
 
@@ -140,7 +140,7 @@ You should see a response similar to the following:
 
 ## Swqgger UI Client
 
-To generate a SwaggerUI client, run `aqueduct document client`.
+To generate a SwaggerUI client, run `aqueduct_2 document client`.
 
 ## Running Application Tests
 
@@ -154,4 +154,4 @@ The default configuration file used when testing is `config.src.yaml`. This file
 
 ## Deploying an Application
 
-See the documentation for [Deployment](https://aqueduct.io/docs/deploy/).
+See the documentation for [Deployment](https://discoos.github.io/aqueduct-2/docs/deploy/).

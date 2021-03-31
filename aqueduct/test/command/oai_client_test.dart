@@ -1,6 +1,6 @@
 // ignore: unnecessary_const
 @Tags(const ["cli"])
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
@@ -30,7 +30,8 @@ void main() {
 
     final clientContents = projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
-    expect(clientContents, contains('<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
+    expect(clientContents,
+        contains('<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
 
     // make sure auth urls were replaced
     expect(clientContents, contains('"authorizationUrl":"http://localhost:8888/auth/form"'));
@@ -43,7 +44,8 @@ void main() {
 
     final clientContents = projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
-    expect(clientContents, contains('<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
+    expect(clientContents,
+        contains('<script src="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui-bundle.js"></script>'));
 
     // make sure auth urls were replaced
     expect(clientContents, contains('"authorizationUrl":"https://server.com/v1/auth/form"'));

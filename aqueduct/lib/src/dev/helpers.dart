@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/db/query/mixin.dart';
-export 'package:aqueduct/src/dev/context_helpers.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/db/query/mixin.dart';
+export 'package:aqueduct_2/src/dev/context_helpers.dart';
 
 void justLogEverything() {
   hierarchicalLoggingEnabled = true;
@@ -125,8 +125,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
         ..id = i + 1
         ..username = "bob+$i@stablekernel.com"
         ..salt = salt
-        ..hashedPassword =
-            AuthUtility.generatePasswordHash(defaultPassword, salt);
+        ..hashedPassword = AuthUtility.generatePasswordHash(defaultPassword, salt);
 
       users[i + 1] = u;
     }
@@ -135,38 +134,22 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   void reset() {
     var salt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
     clients = {
-      "com.stablekernel.app1": AuthClient("com.stablekernel.app1",
-          AuthUtility.generatePasswordHash("kilimanjaro", salt), salt),
-      "com.stablekernel.app2": AuthClient("com.stablekernel.app2",
-          AuthUtility.generatePasswordHash("fuji", salt), salt),
-      "com.stablekernel.redirect": AuthClient.withRedirectURI(
-          "com.stablekernel.redirect",
-          AuthUtility.generatePasswordHash("mckinley", salt),
-          salt,
-          "http://stablekernel.com/auth/redirect"),
-      "com.stablekernel.public":
-          AuthClient("com.stablekernel.public", null, salt),
-      "com.stablekernel.redirect2": AuthClient.withRedirectURI(
-          "com.stablekernel.redirect2",
-          AuthUtility.generatePasswordHash("gibraltar", salt),
-          salt,
-          "http://stablekernel.com/auth/redirect2"),
+      "com.stablekernel.app1":
+          AuthClient("com.stablekernel.app1", AuthUtility.generatePasswordHash("kilimanjaro", salt), salt),
+      "com.stablekernel.app2":
+          AuthClient("com.stablekernel.app2", AuthUtility.generatePasswordHash("fuji", salt), salt),
+      "com.stablekernel.redirect": AuthClient.withRedirectURI("com.stablekernel.redirect",
+          AuthUtility.generatePasswordHash("mckinley", salt), salt, "http://stablekernel.com/auth/redirect"),
+      "com.stablekernel.public": AuthClient("com.stablekernel.public", null, salt),
+      "com.stablekernel.redirect2": AuthClient.withRedirectURI("com.stablekernel.redirect2",
+          AuthUtility.generatePasswordHash("gibraltar", salt), salt, "http://stablekernel.com/auth/redirect2"),
       "com.stablekernel.public.redirect": AuthClient.withRedirectURI(
-          "com.stablekernel.public.redirect",
-          null,
-          salt,
-          "http://stablekernel.com/auth/public-redirect"),
-      "com.stablekernel.scoped": AuthClient.withRedirectURI(
-          "com.stablekernel.scoped",
-          AuthUtility.generatePasswordHash("kilimanjaro", salt),
-          salt,
-          "http://stablekernel.com/auth/scoped",
+          "com.stablekernel.public.redirect", null, salt, "http://stablekernel.com/auth/public-redirect"),
+      "com.stablekernel.scoped": AuthClient.withRedirectURI("com.stablekernel.scoped",
+          AuthUtility.generatePasswordHash("kilimanjaro", salt), salt, "http://stablekernel.com/auth/scoped",
           allowedScopes: [AuthScope("user"), AuthScope("other_scope")]),
       "com.stablekernel.public.scoped": AuthClient.withRedirectURI(
-          "com.stablekernel.public.scoped",
-          null,
-          salt,
-          "http://stablekernel.com/auth/public-scoped",
+          "com.stablekernel.public.scoped", null, salt, "http://stablekernel.com/auth/public-scoped",
           allowedScopes: [AuthScope("user"), AuthScope("other_scope")]),
     };
     users = {};
@@ -185,18 +168,14 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  FutureOr<AuthToken> getToken(AuthServer server,
-      {String byAccessToken, String byRefreshToken}) {
+  FutureOr<AuthToken> getToken(AuthServer server, {String byAccessToken, String byRefreshToken}) {
     AuthToken existing;
     if (byAccessToken != null) {
-      existing = tokens.firstWhere((t) => t.accessToken == byAccessToken,
-          orElse: () => null);
+      existing = tokens.firstWhere((t) => t.accessToken == byAccessToken, orElse: () => null);
     } else if (byRefreshToken != null) {
-      existing = tokens.firstWhere((t) => t.refreshToken == byRefreshToken,
-          orElse: () => null);
+      existing = tokens.firstWhere((t) => t.refreshToken == byRefreshToken, orElse: () => null);
     } else {
-      throw ArgumentError(
-          "byAccessToken and byRefreshToken are mutually exclusive");
+      throw ArgumentError("byAccessToken and byRefreshToken are mutually exclusive");
     }
 
     if (existing == null) {
@@ -207,8 +186,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
   @override
   FutureOr<TestUser> getResourceOwner(AuthServer server, String username) {
-    return users.values
-        .firstWhere((t) => t.username == username, orElse: () => null);
+    return users.values.firstWhere((t) => t.username == username, orElse: () => null);
   }
 
   @override
@@ -218,9 +196,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   @override
   FutureOr addToken(AuthServer server, AuthToken token, {AuthCode issuedFrom}) {
     if (issuedFrom != null) {
-      var existingIssued = tokens.firstWhere(
-          (t) => t.code == issuedFrom?.code,
-          orElse: () => null);
+      var existingIssued = tokens.firstWhere((t) => t.code == issuedFrom?.code, orElse: () => null);
       var replacement = TestToken.from(token);
       replacement.code = issuedFrom.code;
       replacement.scopes = issuedFrom.requestedScopes;
@@ -235,14 +211,9 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  FutureOr updateToken(
-      AuthServer server,
-      String oldAccessToken,
-      String newAccessToken,
-      DateTime newIssueDate,
+  FutureOr updateToken(AuthServer server, String oldAccessToken, String newAccessToken, DateTime newIssueDate,
       DateTime newExpirationDate) {
-    var existing = tokens.firstWhere((e) => e.accessToken == oldAccessToken,
-        orElse: () => null);
+    var existing = tokens.firstWhere((e) => e.accessToken == oldAccessToken, orElse: () => null);
     if (existing != null) {
       var replacement = TestToken.from(existing)
         ..expirationDate = newExpirationDate
@@ -261,8 +232,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  void addCode(AuthServer server, AuthCode code) =>
-      tokens.add(TestToken.from(code));
+  void addCode(AuthServer server, AuthCode code) => tokens.add(TestToken.from(code));
 
   @override
   FutureOr<AuthCode> getCode(AuthServer server, String code) {
@@ -274,8 +244,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   @override
-  void removeCode(AuthServer server, String code) =>
-      tokens.removeWhere((c) => c.code == code);
+  void removeCode(AuthServer server, String code) => tokens.removeWhere((c) => c.code == code);
 
   @override
   FutureOr<AuthClient> getClient(AuthServer server, String clientID) => clients[clientID];
@@ -289,8 +258,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
 class DefaultPersistentStore extends PersistentStore {
   @override
-  Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity entity, {T values}) {
+  Query<T> newQuery<T extends ManagedObject>(ManagedContext context, ManagedEntity entity, {T values}) {
     final q = _MockQuery<T>.withEntity(context, entity);
     if (values != null) {
       q.values = values;
@@ -299,13 +267,10 @@ class DefaultPersistentStore extends PersistentStore {
   }
 
   @override
-  Future<dynamic> execute(String sql,
-          {Map<String, dynamic> substitutionValues}) async =>
-      null;
+  Future<dynamic> execute(String sql, {Map<String, dynamic> substitutionValues}) async => null;
 
   @override
-  Future<dynamic> executeQuery(String formatString, Map<String, dynamic> values,
-          int timeoutInSeconds,
+  Future<dynamic> executeQuery(String formatString, Map<String, dynamic> values, int timeoutInSeconds,
           {PersistentStoreQueryReturnType returnType}) async =>
       null;
 
@@ -313,8 +278,8 @@ class DefaultPersistentStore extends PersistentStore {
   Future close() async {}
 
   @override
-  Future<T> transaction<T>(ManagedContext transactionContext,
-          Future<T> transactionBlock(ManagedContext transaction)) async =>
+  Future<T> transaction<T>(
+          ManagedContext transactionContext, Future<T> transactionBlock(ManagedContext transaction)) async =>
       throw Exception("Transaciton not supported on mock");
 
   @override
@@ -333,54 +298,40 @@ class DefaultPersistentStore extends PersistentStore {
   List<String> deleteTableUniqueColumnSet(SchemaTable table) => [];
 
   @override
-  List<String> addColumn(SchemaTable table, SchemaColumn column,
-          {String unencodedInitialValue}) =>
-      [];
+  List<String> addColumn(SchemaTable table, SchemaColumn column, {String unencodedInitialValue}) => [];
 
   @override
   List<String> deleteColumn(SchemaTable table, SchemaColumn column) => [];
 
   @override
-  List<String> renameColumn(
-          SchemaTable table, SchemaColumn column, String name) =>
-      [];
+  List<String> renameColumn(SchemaTable table, SchemaColumn column, String name) => [];
 
   @override
-  List<String> alterColumnNullability(SchemaTable table, SchemaColumn column,
-          String unencodedInitialValue) =>
-      [];
+  List<String> alterColumnNullability(SchemaTable table, SchemaColumn column, String unencodedInitialValue) => [];
 
   @override
-  List<String> alterColumnUniqueness(SchemaTable table, SchemaColumn column) =>
-      [];
+  List<String> alterColumnUniqueness(SchemaTable table, SchemaColumn column) => [];
 
   @override
-  List<String> alterColumnDefaultValue(
-          SchemaTable table, SchemaColumn column) =>
-      [];
+  List<String> alterColumnDefaultValue(SchemaTable table, SchemaColumn column) => [];
 
   @override
-  List<String> alterColumnDeleteRule(SchemaTable table, SchemaColumn column) =>
-      [];
+  List<String> alterColumnDeleteRule(SchemaTable table, SchemaColumn column) => [];
 
   @override
   List<String> addIndexToColumn(SchemaTable table, SchemaColumn column) => [];
 
   @override
-  List<String> renameIndex(
-          SchemaTable table, SchemaColumn column, String newIndexName) =>
-      [];
+  List<String> renameIndex(SchemaTable table, SchemaColumn column, String newIndexName) => [];
 
   @override
-  List<String> deleteIndexFromColumn(SchemaTable table, SchemaColumn column) =>
-      [];
+  List<String> deleteIndexFromColumn(SchemaTable table, SchemaColumn column) => [];
 
   @override
   Future<int> get schemaVersion async => 0;
 
   @override
-  Future<Schema> upgrade(Schema fromSchema, List<Migration> withMigrations,
-      {bool temporary = false}) async {
+  Future<Schema> upgrade(Schema fromSchema, List<Migration> withMigrations, {bool temporary = false}) async {
     var out = fromSchema;
     for (var migration in withMigrations) {
       migration.database = SchemaBuilder(this, out);
@@ -405,8 +356,7 @@ class _MockQuery<InstanceType extends ManagedObject> extends Object
   ManagedContext context;
 
   @override
-  ManagedEntity get entity =>
-      _entity ?? context.dataModel.entityForType(InstanceType);
+  ManagedEntity get entity => _entity ?? context.dataModel.entityForType(InstanceType);
 
   ManagedEntity _entity;
 

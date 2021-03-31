@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 void main() {
-  test("Modifying return value from Response.headers changes actual headers",
-      () {
+  test("Modifying return value from Response.headers changes actual headers", () {
     var response = Response(0, {}, null);
     response.headers["a"] = "b";
 
@@ -55,8 +54,7 @@ void main() {
   });
 
   test("contentType property overrides any headers", () {
-    var response = Response.ok(null,
-        headers: {HttpHeaders.contentTypeHeader: "application/xml"});
+    var response = Response.ok(null, headers: {HttpHeaders.contentTypeHeader: "application/xml"});
     response.contentType = ContentType.json;
 
     expect(response.contentType, ContentType.json);
@@ -64,21 +62,14 @@ void main() {
     expect(response.contentType, ContentType.json);
   });
 
-  test(
-      "Setting content type as String through headers returns same type from contentType",
-      () {
-    var response = Response.ok(null,
-        headers: {HttpHeaders.contentTypeHeader: "application/xml"});
+  test("Setting content type as String through headers returns same type from contentType", () {
+    var response = Response.ok(null, headers: {HttpHeaders.contentTypeHeader: "application/xml"});
     expect(response.contentType.primaryType, "application");
     expect(response.contentType.subType, "xml");
   });
 
-  test(
-      "Setting content type as ContentType through headers returns same type from contentType",
-      () {
-    var response = Response.ok(null, headers: {
-      HttpHeaders.contentTypeHeader: ContentType("application", "xml")
-    });
+  test("Setting content type as ContentType through headers returns same type from contentType", () {
+    var response = Response.ok(null, headers: {HttpHeaders.contentTypeHeader: ContentType("application", "xml")});
     expect(response.contentType.primaryType, "application");
     expect(response.contentType.subType, "xml");
   });

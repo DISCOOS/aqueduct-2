@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:aqueduct/src/application/channel.dart';
+import 'package:aqueduct_2/src/application/channel.dart';
 
 import 'application.dart';
 

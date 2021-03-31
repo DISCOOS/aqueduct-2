@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:aqueduct/src/application/isolate_application_server.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/src/application/isolate_application_server.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:logging/logging.dart';
 
 import '../http/http.dart';
@@ -77,8 +77,7 @@ class Application<T extends ApplicationChannel> {
   /// See also [startOnCurrentIsolate] for starting an application when running automated tests.
   Future start({int numberOfInstances = 1, bool consoleLogging = false}) async {
     if (server != null || supervisors.isNotEmpty) {
-      throw StateError(
-          "Application error. Cannot invoke 'start' on already running Aqueduct application.");
+      throw StateError("Application error. Cannot invoke 'start' on already running Aqueduct application.");
     }
 
     if (options.address == null) {
@@ -93,9 +92,8 @@ class Application<T extends ApplicationChannel> {
       await _runtime.runGlobalInitialization(options);
 
       for (var i = 0; i < numberOfInstances; i++) {
-        final supervisor = await _spawn(
-            this, options, i + 1, logger, isolateStartupTimeout,
-            logToConsole: consoleLogging);
+        final supervisor =
+            await _spawn(this, options, i + 1, logger, isolateStartupTimeout, logToConsole: consoleLogging);
         supervisors.add(supervisor);
         await supervisor.resume();
       }
@@ -114,10 +112,9 @@ class Application<T extends ApplicationChannel> {
   /// Performance is limited when running the application with this method; prefer to use [start].
   Future startOnCurrentIsolate() async {
     if (server != null || supervisors.isNotEmpty) {
-      throw StateError(
-          "Application error. Cannot invoke 'test' on already running Aqueduct application.");
+      throw StateError("Application error. Cannot invoke 'test' on already running Aqueduct application.");
     }
-    
+
     options.address ??= InternetAddress.loopbackIPv4;
 
     try {
@@ -154,10 +151,9 @@ class Application<T extends ApplicationChannel> {
   /// Creates an [APIDocument] from an [ApplicationChannel].
   ///
   /// This method is called by the `aqueduct document` CLI.
-  static Future<APIDocument> document(Type type,
-      ApplicationOptions config, Map<String, dynamic> projectSpec) async {
+  static Future<APIDocument> document(Type type, ApplicationOptions config, Map<String, dynamic> projectSpec) async {
     final runtime = RuntimeContext.current[type] as ChannelRuntime;
-    
+
     await runtime.runGlobalInitialization(config);
 
     final server = ApplicationServer(runtime.channelType, config, 1);
@@ -172,27 +168,21 @@ class Application<T extends ApplicationChannel> {
   }
 
   Future<ApplicationIsolateSupervisor> _spawn(
-    Application application,
-    ApplicationOptions config,
-    int identifier,
-    Logger logger,
-    Duration startupTimeout,
-    {bool logToConsole = false}) async {
+      Application application, ApplicationOptions config, int identifier, Logger logger, Duration startupTimeout,
+      {bool logToConsole = false}) async {
     final receivePort = ReceivePort();
 
     final libraryUri = _runtime.libraryUri;
     final typeName = _runtime.name;
     final entryPoint = _runtime.isolateEntryPoint;
 
-    final initialMessage = ApplicationInitialServerMessage(typeName,
-      libraryUri, config, identifier, receivePort.sendPort,
-      logToConsole: logToConsole);
-    final isolate = await Isolate.spawn(entryPoint, initialMessage,
-      paused: true);
+    final initialMessage = ApplicationInitialServerMessage(
+        typeName, libraryUri, config, identifier, receivePort.sendPort,
+        logToConsole: logToConsole);
+    final isolate = await Isolate.spawn(entryPoint, initialMessage, paused: true);
 
-    return ApplicationIsolateSupervisor(
-      application, isolate, receivePort, identifier, logger,
-      startupTimeout: startupTimeout);
+    return ApplicationIsolateSupervisor(application, isolate, receivePort, identifier, logger,
+        startupTimeout: startupTimeout);
   }
 }
 

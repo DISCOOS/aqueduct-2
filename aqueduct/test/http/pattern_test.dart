@@ -1,6 +1,6 @@
-import 'package:aqueduct/src/http/route_node.dart';
+import 'package:aqueduct_2/src/http/route_node.dart';
 import "package:test/test.dart";
-import 'package:aqueduct/src/http/route_specification.dart';
+import 'package:aqueduct_2/src/http/route_specification.dart';
 
 void main() {
   group("Pattern splitting", () {

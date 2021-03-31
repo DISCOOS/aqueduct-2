@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
+import 'package:isolate_executor_2/isolate_executor_2.dart';
 
 class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
   GetSchemaExecutable(Map<String, dynamic> message) : super(message);
@@ -22,9 +22,9 @@ class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
   }
 
   static List<String> importsForPackage(String packageName) => [
-        "package:aqueduct/aqueduct.dart",
+        "package:aqueduct_2/aqueduct_2.dart",
         "package:$packageName/$packageName.dart",
-        "package:runtime/runtime.dart"
+        "package:runtime_2/runtime_2.dart"
       ];
 }
 

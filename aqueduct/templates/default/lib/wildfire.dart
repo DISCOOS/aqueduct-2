@@ -6,6 +6,6 @@ library wildfire;
 export 'dart:async';
 export 'dart:io';
 
-export 'package:aqueduct/aqueduct.dart';
+export 'package:aqueduct_2/aqueduct_2.dart';
 
 export 'channel.dart';

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -29,13 +29,13 @@ void main() {
     });
 
     test("Application responds to request", () async {
-      var response = await http.get("http://localhost:8888/t");
+      var response = await http.get(Uri.parse('http://localhost:8888/t'));
       expect(response.statusCode, 200);
     });
 
     test("Application properly routes request", () async {
-      var tRequest = http.get("http://localhost:8888/t");
-      var rRequest = http.get("http://localhost:8888/r");
+      var tRequest = http.get(Uri.parse('http://localhost:8888/t'));
+      var rRequest = http.get(Uri.parse('http://localhost:8888/r'));
 
       var tResponse = await tRequest;
       var rResponse = await rRequest;
@@ -48,7 +48,7 @@ void main() {
       var reqs = <Future>[];
       var responses = <http.Response>[];
       for (int i = 0; i < 20; i++) {
-        var req = http.get("http://localhost:8888/t");
+        var req = http.get(Uri.parse('http://localhost:8888/t'));
         // ignore: unawaited_futures
         req.then((resp) {
           responses.add(resp);
@@ -58,36 +58,28 @@ void main() {
 
       await Future.wait(reqs);
 
-      expect(
-          responses.any(
-              (http.Response resp) => resp.headers["server"] == "aqueduct/1"),
-          true);
-      expect(
-          responses.any(
-              (http.Response resp) => resp.headers["server"] == "aqueduct/2"),
-          true);
+      expect(responses.any((http.Response resp) => resp.headers["server"] == "aqueduct/1"), true);
+      expect(responses.any((http.Response resp) => resp.headers["server"] == "aqueduct/2"), true);
     });
 
     test("Application stops", () async {
       await app.stop();
 
       try {
-        await http.get("http://localhost:8888/t");
+        await http.get(Uri.parse('http://localhost:8888/t'));
         // ignore: empty_catches
       } on SocketException {}
 
       await app.start(numberOfInstances: 2, consoleLogging: true);
 
-      var resp = await http.get("http://localhost:8888/t");
+      var resp = await http.get(Uri.parse('http://localhost:8888/t'));
       expect(resp.statusCode, 200);
     });
 
-    test(
-        "Application runs app startup function once, regardless of isolate count",
-        () async {
+    test("Application runs app startup function once, regardless of isolate count", () async {
       var sum = 0;
       for (var i = 0; i < 10; i++) {
-        var result = await http.get("http://localhost:8888/startup");
+        var result = await http.get(Uri.parse('http://localhost:8888/startup'));
         sum += int.parse(json.decode(result.body) as String);
       }
       expect(sum, 10);
@@ -101,9 +93,7 @@ void main() {
       await app?.stop();
     });
 
-    test(
-        "didFinishLaunching is false before launch, true after, false after stop",
-        () async {
+    test("didFinishLaunching is false before launch, true after, false after stop", () async {
       app = Application<TestChannel>();
       expect(app.isRunning, false);
 

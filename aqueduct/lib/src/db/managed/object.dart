@@ -1,5 +1,5 @@
-import 'package:aqueduct/src/db/managed/data_model_manager.dart';
-import 'package:aqueduct/src/openapi/openapi.dart';
+import 'package:aqueduct_2/src/db/managed/data_model_manager.dart';
+import 'package:aqueduct_2/src/openapi/openapi.dart';
 import 'package:meta/meta.dart';
 
 import '../../http/serializable.dart';
@@ -64,7 +64,7 @@ abstract class ManagedBacking {
 /// A subclass of this type must implement its table definition and use it as the type argument of [ManagedObject]. Properties and methods
 /// declared in the subclass (also called the 'instance type') are not stored in the database.
 ///
-/// See more documentation on defining a data model at http://aqueduct.io/docs/db/modeling_data/
+/// See more documentation on defining a data model at http://discoos.github.io/aqueduct-2/docs/db/modeling_data/
 abstract class ManagedObject<T> extends Serializable {
   static bool get shouldAutomaticallyDocument => false;
 
@@ -112,8 +112,7 @@ abstract class ManagedObject<T> extends Serializable {
 
   /// Removes multiple properties from [backing].
   void removePropertiesFromBackingMap(List<String> propertyNames) {
-    propertyNames
-        .forEach((propertyName) => backing.removeProperty(propertyName));
+    propertyNames.forEach((propertyName) => backing.removeProperty(propertyName));
   }
 
   /// Checks whether or not a property has been set in this instances' [backing].
@@ -191,8 +190,7 @@ abstract class ManagedObject<T> extends Serializable {
       if (invocation.isGetter) {
         return this[propertyName];
       } else if (invocation.isSetter) {
-        this[propertyName] =
-          invocation.positionalArguments.first;
+        this[propertyName] = invocation.positionalArguments.first;
 
         return null;
       }
@@ -214,8 +212,7 @@ abstract class ManagedObject<T> extends Serializable {
 
       if (property is ManagedAttributeDescription) {
         if (!property.isTransient) {
-          backing.setValueForProperty(
-              property, property.convertFromPrimitiveValue(v));
+          backing.setValueForProperty(property, property.convertFromPrimitiveValue(v));
         } else {
           if (!property.transientStatus.isAvailableAsInput) {
             throw ValidationException(["invalid input key '$key'"]);
@@ -230,8 +227,7 @@ abstract class ManagedObject<T> extends Serializable {
           entity.runtime.setTransientValueForKey(this, key, decodedValue);
         }
       } else {
-        backing.setValueForProperty(
-            property, property.convertFromPrimitiveValue(v));
+        backing.setValueForProperty(property, property.convertFromPrimitiveValue(v));
       }
     });
   }
@@ -255,9 +251,7 @@ abstract class ManagedObject<T> extends Serializable {
       }
     });
 
-    entity.attributes.values
-        .where((attr) => attr.transientStatus?.isAvailableAsOutput ?? false)
-        .forEach((attr) {
+    entity.attributes.values.where((attr) => attr.transientStatus?.isAvailableAsOutput ?? false).forEach((attr) {
       var value = entity.runtime.getTransientValueForKey(this, attr.name);
       if (value != null) {
         outputMap[attr.name] = value;
@@ -270,6 +264,5 @@ abstract class ManagedObject<T> extends Serializable {
   @override
   APISchemaObject documentSchema(APIDocumentContext context) => entity.document(context);
 
-  static bool _isPropertyPrivate(String propertyName) =>
-      propertyName.startsWith("_");
+  static bool _isPropertyPrivate(String propertyName) => propertyName.startsWith("_");
 }

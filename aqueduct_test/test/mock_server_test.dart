@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:aqueduct_test/aqueduct_test.dart';
 import 'package:test/test.dart';
 
@@ -30,7 +30,7 @@ void main() {
     });
 
     test("Request is enqueued and immediately available", () async {
-      await testClient.get("/hello", query: {"foo": "bar"}, headers: {"X": "Y"});
+      await testClient.get('/hello', query: {"foo": "bar"}, headers: {"X": "Y"});
 
       final serverRequest = await server.next();
       expect(serverRequest.method, "GET");
@@ -61,24 +61,19 @@ void main() {
       expect(server.isEmpty, true);
     });
 
-    test(
-        "Mock server returns an error by default if there are no enqueued requests",
-        () async {
+    test("Mock server returns an error by default if there are no enqueued requests", () async {
       final response = await testClient.request("/hello").get();
       expect(response.statusCode, 503);
     });
 
     test("Mock server default response can be changed", () async {
-      server.defaultResponse =
-          Response.ok({"key": "This is the default response"});
+      server.defaultResponse = Response.ok({"key": "This is the default response"});
 
       final response = await testClient.request("/hello").get();
-      expect(response,
-          hasResponse(200, body: {"key": "This is the default response"}));
+      expect(response, hasResponse(200, body: {"key": "This is the default response"}));
     });
 
-    test("Queued response count returns correct number of queued requests",
-        () async {
+    test("Queued response count returns correct number of queued requests", () async {
       expect(server.queuedResponseCount, 0);
       server.queueResponse(Response.ok(null));
       expect(server.queuedResponseCount, 1);
@@ -93,24 +88,21 @@ void main() {
     });
 
     test("Mock Server respects delays for queued requests", () async {
-      server.queueResponse(Response.ok(null),
-          delay: Duration(milliseconds: 1000));
+      server.queueResponse(Response.ok(null), delay: const Duration(milliseconds: 1000));
 
       var responseReturned = false;
       final responseFuture = testClient.request("/hello").get();
       // ignore: unawaited_futures
       responseFuture.whenComplete(() => responseReturned = true);
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
       expect(responseReturned, false);
-      await Future.delayed(Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1500));
       expect(responseReturned, true);
     });
 
-    test(
-        "Mock server uses default delay for requests without an explicit delay",
-        () async {
-      server.defaultDelay = Duration(milliseconds: 1000);
+    test("Mock server uses default delay for requests without an explicit delay", () async {
+      server.defaultDelay = const Duration(milliseconds: 1000);
       server.queueResponse(Response.ok(null));
 
       var responseReturned = false;
@@ -118,36 +110,35 @@ void main() {
       // ignore: unawaited_futures
       responseFuture.whenComplete(() => responseReturned = true);
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
       expect(responseReturned, false);
-      await Future.delayed(Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1500));
       expect(responseReturned, true);
 
-      server.queueResponse(Response.ok(null),
-          delay: Duration(milliseconds: 1000));
+      server.queueResponse(Response.ok(null), delay: const Duration(milliseconds: 1000));
 
       responseReturned = false;
       responseFuture = testClient.request("/hello").get();
       // ignore: unawaited_futures
       responseFuture.whenComplete(() => responseReturned = true);
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
       expect(responseReturned, false);
-      await Future.delayed(Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1500));
       expect(responseReturned, true);
     });
 
     test("Default response respects default delay", () async {
-      server.defaultDelay = Duration(milliseconds: 1000);
+      server.defaultDelay = const Duration(milliseconds: 1000);
 
       var responseReturned = false;
       final responseFuture = testClient.request("/hello").get();
       // ignore: unawaited_futures
       responseFuture.whenComplete(() => responseReturned = true);
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
       expect(responseReturned, false);
-      await Future.delayed(Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1500));
       expect(responseReturned, true);
     });
 
@@ -157,15 +148,12 @@ void main() {
       final outageResponseFuture = testClient.request("/outage").get();
 
       // Introduce a delay to ensure that the /outage request gets there before /success
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
       final successResponse = await testClient.request("/success").get();
 
       expect(successResponse.statusCode, 200);
 
-      expect(
-          outageResponseFuture.timeout(Duration(milliseconds: 100),
-              onTimeout: () {}),
-          completes);
+      expect(outageResponseFuture.timeout(const Duration(milliseconds: 100)), completes);
     });
 
     test("Can provide multiple outages", () async {
@@ -177,7 +165,7 @@ void main() {
       final outageResponseFuture3 = testClient.request("/outage").get();
 
       // Introduce a delay to ensure that the /outage request gets there before /success
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
       final successResponse = await testClient.request("/success").get();
 
       expect(successResponse.statusCode, 200);
@@ -188,13 +176,11 @@ void main() {
     });
 
     test("Can queue handler", () async {
-      server.queueHandler(
-          (req) => Response.ok({"k": req.raw.uri.queryParameters["k"]}));
+      server.queueHandler((req) => Response.ok({"k": req.raw.uri.queryParameters["k"]}));
       final response = await testClient.request("/ok?k=1").get();
       expect(response.body.as<Map>()["k"], "1");
 
-      expect((await testClient.request("/ok").get()).statusCode,
-          server.defaultResponse.statusCode);
+      expect((await testClient.request("/ok").get()).statusCode, server.defaultResponse.statusCode);
     });
   });
 }
@@ -205,5 +191,4 @@ Future spawnFunc(List pair) async {
   final testClient = Agent.onPort(4000);
   sleep(Duration(seconds: delay));
   await testClient.request(path).get().catchError((_) => null);
-
 }

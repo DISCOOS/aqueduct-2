@@ -2,7 +2,7 @@
 @Tags(const ["cli"])
 import 'dart:io';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
@@ -21,7 +21,7 @@ void main() {
   setUp(() async {
     projectUnderTestCli = templateCli.replicate(Uri.parse("replica/"));
     projectUnderTestCli.projectAgent.addLibraryFile("application_test", """
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 class TestObject extends ManagedObject<_TestObject> {}
 
@@ -33,7 +33,6 @@ class _TestObject {
 }
       """);
   });
-
 
   tearDown(() {
     projectUnderTestCli.delete();
@@ -60,11 +59,9 @@ class _TestObject {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart",
-        (contents) {
+    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart", (contents) {
       const upgradeLocation = "upgrade()";
-      final nextLine =
-          contents.indexOf("\n", contents.indexOf(upgradeLocation));
+      final nextLine = contents.indexOf("\n", contents.indexOf(upgradeLocation));
       return contents.replaceRange(nextLine, nextLine + 1, """
         database.createTable(SchemaTable(\"foo\", []));
         """);
@@ -75,17 +72,13 @@ class _TestObject {
     expect(projectUnderTestCli.output, contains("Validation failed"));
   });
 
-  test(
-      "Validating runs all migrations in directory and checks the total product",
-      () async {
+  test("Validating runs all migrations in directory and checks the total product", () async {
     var res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart",
-        (contents) {
+    projectUnderTestCli.agent.modifyFile("migrations/00000001_initial.migration.dart", (contents) {
       const upgradeLocation = "upgrade()";
-      final nextLine =
-          contents.indexOf("\n", contents.indexOf(upgradeLocation));
+      final nextLine = contents.indexOf("\n", contents.indexOf(upgradeLocation));
       return contents.replaceRange(nextLine, nextLine + 1, """
         database.createTable(SchemaTable(\"foo\", []));
         """);
@@ -98,11 +91,9 @@ class _TestObject {
     res = await projectUnderTestCli.run("db", ["generate"]);
     expect(res, 0);
 
-    var secondMigrationFile = File.fromUri(projectUnderTestCli
-        .defaultMigrationDirectory.uri
-        .resolve("00000002_unnamed.migration.dart"));
-    expect(secondMigrationFile.readAsStringSync(),
-        contains("database.deleteTable(\"foo\")"));
+    var secondMigrationFile =
+        File.fromUri(projectUnderTestCli.defaultMigrationDirectory.uri.resolve("00000002_unnamed.migration.dart"));
+    expect(secondMigrationFile.readAsStringSync(), contains("database.deleteTable(\"foo\")"));
 
     res = await projectUnderTestCli.run("db", ["validate"]);
     expect(res, 0);

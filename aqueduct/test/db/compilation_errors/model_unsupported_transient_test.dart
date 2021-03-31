@@ -1,8 +1,7 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
-class InvalidTransientModel extends ManagedObject<_InvalidTransientModel>
-    implements _InvalidTransientModel {
+class InvalidTransientModel extends ManagedObject<_InvalidTransientModel> implements _InvalidTransientModel {
   @Serialize()
   Uri uri;
 }
@@ -13,8 +12,7 @@ class _InvalidTransientModel {
 }
 
 void main() {
-  test("Model with unsupported transient property type fails on compilation",
-      () {
+  test("Model with unsupported transient property type fails on compilation", () {
     try {
       ManagedDataModel([InvalidTransientModel]);
       expect(true, false);

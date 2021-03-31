@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
+import 'package:isolate_executor_2/isolate_executor_2.dart';
 
 class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   MigrationBuilderExecutable(Map<String, dynamic> message)
-      : inputSchema =
-            Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
+      : inputSchema = Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
         versionTag = message["versionTag"] as int,
         super(message);
 
@@ -25,9 +24,7 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
       var schema = Schema.fromDataModel(dataModel);
       var changeList = <String>[];
 
-      final source = Migration.sourceForSchemaUpgrade(
-          inputSchema, schema, versionTag,
-          changeList: changeList);
+      final source = Migration.sourceForSchemaUpgrade(inputSchema, schema, versionTag, changeList: changeList);
       return {
         "source": source,
         "tablesEvaluated": dataModel.entities.map((e) => e.name).toList(),
@@ -41,9 +38,9 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   }
 
   static List<String> importsForPackage(String packageName) => [
-        "package:aqueduct/aqueduct.dart",
+        "package:aqueduct_2/aqueduct_2.dart",
         "package:$packageName/$packageName.dart",
-        "package:runtime/runtime.dart"
+        "package:runtime_2/runtime_2.dart"
       ];
 }
 
@@ -60,11 +57,9 @@ class MigrationBuilderResult {
 
 Future<MigrationBuilderResult> generateMigrationFileForProject(
     CLIProject project, Schema initialSchema, int inputVersion) async {
-  final resultMap = await IsolateExecutor.run(
-      MigrationBuilderExecutable.input(initialSchema, inputVersion),
+  final resultMap = await IsolateExecutor.run(MigrationBuilderExecutable.input(initialSchema, inputVersion),
       packageConfigURI: project.packageConfigUri,
-      imports:
-          MigrationBuilderExecutable.importsForPackage(project.packageName),
+      imports: MigrationBuilderExecutable.importsForPackage(project.packageName),
       logHandler: project.displayProgress);
 
   if (resultMap.containsKey("error")) {

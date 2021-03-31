@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -23,8 +23,7 @@ class _MissingInverse1 {
   MissingInverseWrongSymbol inverse;
 }
 
-class MissingInverseWrongSymbol
-    extends ManagedObject<_MissingInverseWrongSymbol> {}
+class MissingInverseWrongSymbol extends ManagedObject<_MissingInverseWrongSymbol> {}
 
 class _MissingInverseWrongSymbol {
   @primaryKey

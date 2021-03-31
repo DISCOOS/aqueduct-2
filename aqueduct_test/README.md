@@ -4,8 +4,8 @@ This is a fork maintained by [DISCO Open Source](https://discoos.org).
 
 ***
 
-Test framework for [aqueduct](https://aqueduct.io) applications. This package is included as a `dev_dependency` of `aqueduct` applications.
+Test framework for [aqueduct](https://discoos.github.io/aqueduct-2) applications. This package is included as a `dev_dependency` of `aqueduct` applications.
 
-The documentation for this package is available at [https://aqueduct.io/docs/testing/](https://aqueduct.io/docs/testing/).
+The documentation for this package is available at [https://discoos.github.io/aqueduct-2/docs/testing/](https://discoos.github.io/aqueduct-2/docs/testing/).
 
 

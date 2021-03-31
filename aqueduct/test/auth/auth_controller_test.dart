@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:aqueduct_test/aqueduct_test.dart';
 
-import 'package:aqueduct/src/dev/helpers.dart';
+import 'package:aqueduct_2/src/dev/helpers.dart';
 
 void main() {
   HttpServer server;
@@ -20,13 +20,10 @@ void main() {
     authenticationServer = AuthServer(storage);
 
     router = Router();
-    router
-        .route("/auth/token")
-        .link(() => AuthController(authenticationServer));
+    router.route("/auth/token").link(() => AuthController(authenticationServer));
     router.didAddToChannel();
 
-    server =
-        await HttpServer.bind("localhost", 8888, v6Only: false, shared: false);
+    server = await HttpServer.bind("localhost", 8888, v6Only: false, shared: false);
     server.map((req) => Request(req)).listen(router.receive);
   });
 
@@ -38,8 +35,7 @@ void main() {
   ///////
 
   group("Success Cases: password", () {
-    test("Confidental Client has all parameters including refresh_token",
-        () async {
+    test("Confidental Client has all parameters including refresh_token", () async {
       var res = await grant("com.stablekernel.app1", "kilimanjaro", user1);
 
       expect(res, hasAuthResponse(200, bearerTokenMatcher));
@@ -51,9 +47,7 @@ void main() {
       expect(res, hasAuthResponse(200, bearerTokenWithoutRefreshMatcher));
     });
 
-    test(
-        "Can authenticate with resource owner grant with client ID that has redirect url",
-        () async {
+    test("Can authenticate with resource owner grant with client ID that has redirect url", () async {
       var res = await grant("com.stablekernel.redirect", "mckinley", user1);
       expect(res, hasAuthResponse(200, bearerTokenMatcher));
     });
@@ -67,27 +61,21 @@ void main() {
 
       m["scope"] = "user other_scope";
       res = await grant("com.stablekernel.scoped", "kilimanjaro", m);
-      expect(
-          res,
-          hasAuthResponse(
-              200, bearerTokenMatcherWithScope("user other_scope")));
+      expect(res, hasAuthResponse(200, bearerTokenMatcherWithScope("user other_scope")));
     });
   });
 
   group("Success Cases: refresh_token", () {
-    test(
-        "Confidental Client gets a new access token, retains same access token",
-        () async {
+    test("Confidental Client gets a new access token, retains same access token", () async {
       var resToken = await grant("com.stablekernel.app1", "kilimanjaro", user1);
 
-      var resRefresh = await refresh("com.stablekernel.app1", "kilimanjaro",
-          refreshTokenMapFromTokenResponse(resToken));
+      var resRefresh =
+          await refresh("com.stablekernel.app1", "kilimanjaro", refreshTokenMapFromTokenResponse(resToken));
       expect(
           resRefresh,
           hasResponse(200, body: {
             "access_token": isString,
-            "refresh_token":
-                resToken.body.as<Map<String, dynamic>>()["refresh_token"],
+            "refresh_token": resToken.body.as<Map<String, dynamic>>()["refresh_token"],
             "expires_in": greaterThan(3500),
             "token_type": "bearer"
           }, headers: {
@@ -102,21 +90,19 @@ void main() {
           }));
     });
 
-    test("If token is scoped and scope is omitted, get same token back",
-        () async {
+    test("If token is scoped and scope is omitted, get same token back", () async {
       var m = Map<String, String>.from(user1);
       m["scope"] = "user";
 
       var resToken = await grant("com.stablekernel.scoped", "kilimanjaro", m);
 
-      var resRefresh = await refresh("com.stablekernel.scoped", "kilimanjaro",
-          refreshTokenMapFromTokenResponse(resToken));
+      var resRefresh =
+          await refresh("com.stablekernel.scoped", "kilimanjaro", refreshTokenMapFromTokenResponse(resToken));
       expect(
           resRefresh,
           hasResponse(200, body: {
             "access_token": isString,
-            "refresh_token":
-                resToken.body.as<Map<String, dynamic>>()["refresh_token"],
+            "refresh_token": resToken.body.as<Map<String, dynamic>>()["refresh_token"],
             "expires_in": greaterThan(3500),
             "token_type": "bearer",
             "scope": "user"
@@ -132,8 +118,7 @@ void main() {
           }));
     });
 
-    test("If token is scoped and scope is part of request, get rescoped token",
-        () async {
+    test("If token is scoped and scope is part of request, get rescoped token", () async {
       var m = Map<String, String>.from(user1);
       m["scope"] = "user other_scope";
 
@@ -141,14 +126,12 @@ void main() {
 
       var refreshMap = refreshTokenMapFromTokenResponse(resToken);
       refreshMap["scope"] = "user";
-      var resRefresh =
-          await refresh("com.stablekernel.scoped", "kilimanjaro", refreshMap);
+      var resRefresh = await refresh("com.stablekernel.scoped", "kilimanjaro", refreshMap);
       expect(
           resRefresh,
           hasResponse(200, body: {
             "access_token": isString,
-            "refresh_token":
-                resToken.body.as<Map<String, dynamic>>()["refresh_token"],
+            "refresh_token": resToken.body.as<Map<String, dynamic>>()["refresh_token"],
             "expires_in": greaterThan(3500),
             "token_type": "bearer",
             "scope": "user"
@@ -166,12 +149,10 @@ void main() {
   });
 
   group("Success Cases: authorization_code", () {
-    test("Exchange valid code gets new access token with refresh token",
-        () async {
+    test("Exchange valid code gets new access token with refresh token", () async {
       var code = await authenticationServer.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
-      var res =
-          await exchange("com.stablekernel.redirect", "mckinley", code.code);
+      var res = await exchange("com.stablekernel.redirect", "mckinley", code.code);
       expect(res, hasAuthResponse(200, bearerTokenMatcher));
     });
 
@@ -180,28 +161,24 @@ void main() {
           user1["username"], user1["password"], "com.stablekernel.scoped",
           requestedScopes: [AuthScope("user")]);
 
-      var res =
-          await exchange("com.stablekernel.scoped", "kilimanjaro", code.code);
+      var res = await exchange("com.stablekernel.scoped", "kilimanjaro", code.code);
       expect(res, hasAuthResponse(200, bearerTokenMatcherWithScope("user")));
     });
   });
 
   group("username Failure Cases", () {
     test("Username does not exist yields 400", () async {
-      var resToken = await grant("com.stablekernel.app1", "kilimanjaro",
-          substituteUser(user1, username: "foobar"));
+      var resToken = await grant("com.stablekernel.app1", "kilimanjaro", substituteUser(user1, username: "foobar"));
       expect(resToken, hasResponse(400, body: {"error": "invalid_grant"}));
     });
 
     test("Username is empty returns 400", () async {
-      var resToken = await grant("com.stablekernel.app1", "kilimanjaro",
-          substituteUser(user1, username: ""));
+      var resToken = await grant("com.stablekernel.app1", "kilimanjaro", substituteUser(user1, username: ""));
       expect(resToken, hasResponse(400, body: {"error": "invalid_grant"}));
     });
 
     test("Username is missing returns 400", () async {
-      var resToken = await grant(
-          "com.stablekernel.app1", "kilimanjaro", {"password": "doesntmatter"});
+      var resToken = await grant("com.stablekernel.app1", "kilimanjaro", {"password": "doesntmatter"});
       expect(resToken, hasResponse(400, body: {"error": "invalid_request"}));
     });
 
@@ -210,8 +187,7 @@ void main() {
       var encodedPassword = Uri.encodeQueryComponent(user1["password"]);
       var encodedWrongUsername = Uri.encodeQueryComponent("!@#kjasd");
       final client = Agent.onPort(8888)
-        ..headers["authorization"] =
-            "Basic ${base64.encode("com.stablekernel.app1:kilimanjaro".codeUnits)}";
+        ..headers["authorization"] = "Basic ${base64.encode("com.stablekernel.app1:kilimanjaro".codeUnits)}";
 
       var req = client.request("/auth/token")
         ..encodeBody = false
@@ -233,20 +209,18 @@ void main() {
 
   group("password Failure Cases", () {
     test("password is incorrect yields 400", () async {
-      var resToken = await grant("com.stablekernel.app1", "kilimanjaro",
-          substituteUser(user1, password: "!@#\$%^&*()"));
+      var resToken =
+          await grant("com.stablekernel.app1", "kilimanjaro", substituteUser(user1, password: "!@#\$%^&*()"));
       expect(resToken, hasResponse(400, body: {"error": "invalid_grant"}));
     });
 
     test("password is empty returns 400", () async {
-      var resToken = await grant("com.stablekernel.app1", "kilimanjaro",
-          substituteUser(user1, password: ""));
+      var resToken = await grant("com.stablekernel.app1", "kilimanjaro", substituteUser(user1, password: ""));
       expect(resToken, hasResponse(400, body: {"error": "invalid_grant"}));
     });
 
     test("password is missing returns 400", () async {
-      var resToken = await grant("com.stablekernel.app1", "kilimanjaro",
-          {"username": "${user1["username"]}"});
+      var resToken = await grant("com.stablekernel.app1", "kilimanjaro", {"username": "${user1["username"]}"});
       expect(resToken, hasResponse(400, body: {"error": "invalid_request"}));
     });
 
@@ -256,8 +230,7 @@ void main() {
       var encodedWrongPassword = Uri.encodeQueryComponent("!@#kjasd");
 
       final client = Agent.onPort(8888)
-        ..headers["authorization"] =
-            "Basic ${base64.encode("com.stablekernel.app1:kilimanjaro".codeUnits)}";
+        ..headers["authorization"] = "Basic ${base64.encode("com.stablekernel.app1:kilimanjaro".codeUnits)}";
 
       var req = client.request("/auth/token")
         ..encodeBody = false
@@ -281,8 +254,7 @@ void main() {
     test("code is invalid (not issued)", () async {
       var code = await authenticationServer.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
-      var res = await exchange(
-          "com.stablekernel.redirect", "mckinley", "a${code.code}");
+      var res = await exchange("com.stablekernel.redirect", "mckinley", "a${code.code}");
       expect(res, hasResponse(400, body: {"error": "invalid_grant"}));
     });
 
@@ -301,21 +273,18 @@ void main() {
           user1["username"], user1["password"], "com.stablekernel.redirect");
       var encodedCode = Uri.encodeQueryComponent(code.code);
 
-      final client = Agent.onPort(8888)
-        ..setBasicAuthorization("com.stablekernel.redirect", "mckinley");
+      final client = Agent.onPort(8888)..setBasicAuthorization("com.stablekernel.redirect", "mckinley");
 
       var req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8
-            .encode("code=$encodedCode&code=abcd&grant_type=authorization_code")
+        ..body = utf8.encode("code=$encodedCode&code=abcd&grant_type=authorization_code")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
       var resp = await req.post();
       expect(resp, hasResponse(400, body: {"error": "invalid_request"}));
 
       req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8
-            .encode("code=abcd&code=$encodedCode&grant_type=authorization_code")
+        ..body = utf8.encode("code=abcd&code=$encodedCode&grant_type=authorization_code")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
       resp = await req.post();
       expect(resp, hasResponse(400, body: {"error": "invalid_request"}));
@@ -324,8 +293,7 @@ void main() {
     test("code is from a different client", () async {
       var code = await authenticationServer.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
-      var res =
-          await exchange("com.stablekernel.redirect2", "gibraltar", code.code);
+      var res = await exchange("com.stablekernel.redirect2", "gibraltar", code.code);
       expect(res, hasResponse(400, body: {"error": "invalid_grant"}));
     });
   });
@@ -334,18 +302,13 @@ void main() {
     Agent client;
 
     setUp(() {
-      client = Agent.onPort(8888)
-        ..setBasicAuthorization("com.stablekernel.app1", "kilimanjaro");
+      client = Agent.onPort(8888)..setBasicAuthorization("com.stablekernel.app1", "kilimanjaro");
     });
 
     test("Unknown grant_type", () async {
       var req = client.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
-        ..body = {
-          "username": user1["username"],
-          "password": user1["password"],
-          "grant_type": "nonsense"
-        };
+        ..body = {"username": user1["username"], "password": user1["password"], "grant_type": "nonsense"};
 
       var res = await req.post();
 
@@ -367,8 +330,7 @@ void main() {
 
       var req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8.encode(
-            "code=abcd&grant_type=authorization_code&grant_type=whatever")
+        ..body = utf8.encode("code=abcd&grant_type=authorization_code&grant_type=whatever")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
 
       var res = await req.post();
@@ -376,8 +338,7 @@ void main() {
 
       req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8.encode(
-            "grant_type=authorization_code&code=abcd&grant_type=whatever")
+        ..body = utf8.encode("grant_type=authorization_code&code=abcd&grant_type=whatever")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
 
       res = await req.post();
@@ -389,8 +350,7 @@ void main() {
     Agent client;
 
     setUp(() {
-      client = Agent.onPort(8888)
-        ..setBasicAuthorization("com.stablekernel.app1", "kilimanjaro");
+      client = Agent.onPort(8888)..setBasicAuthorization("com.stablekernel.app1", "kilimanjaro");
     });
 
     test("refresh_token is omitted", () async {
@@ -403,25 +363,19 @@ void main() {
     });
 
     test("refresh_token appears more than once", () async {
-      final Map<String, dynamic> grantMap =
-          (await grant("com.stablekernel.app1", "kilimanjaro", user1))
-              .body
-              .as();
-      final refreshToken =
-          Uri.encodeQueryComponent(grantMap["refresh_token"] as String);
+      final Map<String, dynamic> grantMap = (await grant("com.stablekernel.app1", "kilimanjaro", user1)).body.as();
+      final refreshToken = Uri.encodeQueryComponent(grantMap["refresh_token"] as String);
 
       var req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8.encode(
-            "refresh_token=$refreshToken&refresh_token=abcdefg&grant_type=refresh_token")
+        ..body = utf8.encode("refresh_token=$refreshToken&refresh_token=abcdefg&grant_type=refresh_token")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
       var resp = await req.post();
       expect(resp, hasResponse(400, body: {"error": "invalid_request"}));
 
       req = client.request("/auth/token")
         ..encodeBody = false
-        ..body = utf8.encode(
-            "refresh_token=abcdefg&refresh_token=$refreshToken&grant_type=refresh_token")
+        ..body = utf8.encode("refresh_token=abcdefg&refresh_token=$refreshToken&grant_type=refresh_token")
         ..contentType = ContentType("application", "x-www-form-urlencoded");
       resp = await req.post();
       expect(resp, hasResponse(400, body: {"error": "invalid_request"}));
@@ -448,8 +402,7 @@ void main() {
     test("Client id/secret pair is different than original", () async {
       var resToken = await grant("com.stablekernel.app1", "kilimanjaro", user1);
 
-      var resRefresh = await refresh("com.stablekernel.app2", "fuji",
-          refreshTokenMapFromTokenResponse(resToken));
+      var resRefresh = await refresh("com.stablekernel.app2", "fuji", refreshTokenMapFromTokenResponse(resToken));
       expect(resRefresh, hasResponse(400, body: {"error": "invalid_grant"}));
     });
   });
@@ -489,9 +442,7 @@ void main() {
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
-    test(
-        "Confidential client can't be used as a public client (i.e. without secret)",
-        () async {
+    test("Confidential client can't be used as a public client (i.e. without secret)", () async {
       var resp = await grant("com.stablekernel.app1", "", user1);
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
@@ -520,20 +471,14 @@ void main() {
       client = Agent.onPort(8888);
 
       refreshTokenString = (await authenticationServer.authenticate(
-              user1["username"],
-              user1["password"],
-              "com.stablekernel.app1",
-              "kilimanjaro"))
+              user1["username"], user1["password"], "com.stablekernel.app1", "kilimanjaro"))
           .refreshToken;
     });
 
     test("Client omits authorization header", () async {
       var req = client.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
-        ..body = {
-          "refresh_token": refreshTokenString,
-          "grant_type": "refresh_token"
-        };
+        ..body = {"refresh_token": refreshTokenString, "grant_type": "refresh_token"};
 
       var resToken = await req.post();
       expect(resToken, hasResponse(400, body: {"error": "invalid_client"}));
@@ -543,50 +488,42 @@ void main() {
       var req = client.request("/auth/token")
         ..headers["Authorization"] = "Basic "
         ..contentType = ContentType("application", "x-www-form-urlencoded")
-        ..body = {
-          "refresh_token": refreshTokenString,
-          "grant_type": "refresh_token"
-        };
+        ..body = {"refresh_token": refreshTokenString, "grant_type": "refresh_token"};
 
       var resToken = await req.post();
       expect(resToken, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("Confidential client has wrong secret", () async {
-      var resp = await refresh("com.stablekernel.app1", "notright",
-          {"refresh_token": refreshTokenString});
+      var resp = await refresh("com.stablekernel.app1", "notright", {"refresh_token": refreshTokenString});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("Confidential client can't be used as a public client", () async {
-      var resp = await refresh(
-          "com.stablekernel.app1", "", {"refresh_token": refreshTokenString});
+      var resp = await refresh("com.stablekernel.app1", "", {"refresh_token": refreshTokenString});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("Confidential Client ID doesn't exist", () async {
-      var resp = await refresh("com.stablekernel.app123", "foo",
-          {"refresh_token": refreshTokenString});
+      var resp = await refresh("com.stablekernel.app123", "foo", {"refresh_token": refreshTokenString});
       expect(resp, hasResponse(400, body: {"error": "invalid_client"}));
     });
 
     test("client id is different than one that generated token", () async {
-      var resp = await refresh("com.stablekernel.app2", "fuji",
-          {"refresh_token": refreshTokenString});
+      var resp = await refresh("com.stablekernel.app2", "fuji", {"refresh_token": refreshTokenString});
       expect(resp, hasResponse(400, body: {"error": "invalid_grant"}));
     });
   });
 
-  group("Authorization Header Failure Cases (authorization_code grant_type)",
-      () {
+  group("Authorization Header Failure Cases (authorization_code grant_type)", () {
     String code;
     Agent client;
 
     setUp(() async {
       client = Agent.onPort(8888);
 
-      code = (await authenticationServer.authenticateForCode(user1["username"],
-              user1["password"], "com.stablekernel.redirect"))
+      code = (await authenticationServer.authenticateForCode(
+              user1["username"], user1["password"], "com.stablekernel.redirect"))
           .code;
     });
 
@@ -625,8 +562,7 @@ void main() {
     });
 
     test("client id is different than one that generated token", () async {
-      var resp =
-          await exchange("com.stablekernel.redirect2", "gibraltar", code);
+      var resp = await exchange("com.stablekernel.redirect2", "gibraltar", code);
       expect(resp, hasResponse(400, body: {"error": "invalid_grant"}));
     });
   });
@@ -637,14 +573,9 @@ void main() {
           user1["username"], user1["password"], "com.stablekernel.scoped",
           requestedScopes: [AuthScope("user")]);
 
-      var m = {
-        "grant_type": "authorization_code",
-        "code": Uri.encodeQueryComponent(code.code),
-        "scope": "other_scope"
-      };
+      var m = {"grant_type": "authorization_code", "code": Uri.encodeQueryComponent(code.code), "scope": "other_scope"};
 
-      final client = Agent.onPort(8888)
-        ..setBasicAuthorization("com.stablekernel.scoped", "kilimanjaro");
+      final client = Agent.onPort(8888)..setBasicAuthorization("com.stablekernel.scoped", "kilimanjaro");
       var req = client.request("/auth/token")
         ..contentType = ContentType("application", "x-www-form-urlencoded")
         ..body = m;
@@ -670,8 +601,7 @@ void main() {
 
       var refreshMap = refreshTokenMapFromTokenResponse(resToken);
       refreshMap["scope"] = "\"user";
-      var resRefresh =
-          await refresh("com.stablekernel.scoped", "kilimanjaro", refreshMap);
+      var resRefresh = await refresh("com.stablekernel.scoped", "kilimanjaro", refreshMap);
       expect(resRefresh, hasResponse(400, body: {"error": "invalid_scope"}));
     });
 
@@ -685,8 +615,7 @@ void main() {
   });
 }
 
-Map<String, String> substituteUser(Map<String, String> initial,
-    {String username, String password}) {
+Map<String, String> substituteUser(Map<String, String> initial, {String username, String password}) {
   var m = Map<String, String>.from(initial);
 
   if (username != null) {
@@ -700,26 +629,17 @@ Map<String, String> substituteUser(Map<String, String> initial,
 }
 
 Map<String, String> refreshTokenMapFromTokenResponse(TestResponse resp) {
-  return {
-    "refresh_token":
-        resp.body.as<Map<String, dynamic>>()["refresh_token"] as String
-  };
+  return {"refresh_token": resp.body.as<Map<String, dynamic>>()["refresh_token"] as String};
 }
 
-Map<String, String> get user1 => const {
-      "username": "bob+0@stablekernel.com",
-      "password": InMemoryAuthStorage.defaultPassword
-    };
+Map<String, String> get user1 =>
+    const {"username": "bob+0@stablekernel.com", "password": InMemoryAuthStorage.defaultPassword};
 
-Map<String, String> get user2 => const {
-      "username": "bob+1@stablekernel.com",
-      "password": InMemoryAuthStorage.defaultPassword
-    };
+Map<String, String> get user2 =>
+    const {"username": "bob+1@stablekernel.com", "password": InMemoryAuthStorage.defaultPassword};
 
-Map<String, String> get user3 => const {
-      "username": "bob+2@stablekernel.com",
-      "password": InMemoryAuthStorage.defaultPassword
-    };
+Map<String, String> get user3 =>
+    const {"username": "bob+2@stablekernel.com", "password": InMemoryAuthStorage.defaultPassword};
 
 dynamic get bearerTokenMatcher => {
       "access_token": hasLength(greaterThan(0)),
@@ -745,8 +665,7 @@ dynamic get bearerTokenWithoutRefreshMatcher => partial({
       "token_type": "bearer"
     });
 
-dynamic hasAuthResponse(int statusCode, dynamic body) =>
-    hasResponse(statusCode, body: body, headers: {
+dynamic hasAuthResponse(int statusCode, dynamic body) => hasResponse(statusCode, body: body, headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
       "content-encoding": "gzip",
@@ -757,10 +676,8 @@ dynamic hasAuthResponse(int statusCode, dynamic body) =>
       "content-length": greaterThan(0)
     });
 
-Future<TestResponse> grant(
-    String clientID, String clientSecret, Map<String, String> form) {
-  Agent client = Agent.onPort(8888)
-    ..setBasicAuthorization(clientID, clientSecret);
+Future<TestResponse> grant(String clientID, String clientSecret, Map<String, String> form) {
+  Agent client = Agent.onPort(8888)..setBasicAuthorization(clientID, clientSecret);
 
   final m = Map<String, String>.from(form);
   m.addAll({"grant_type": "password"});
@@ -772,10 +689,8 @@ Future<TestResponse> grant(
   return req.post();
 }
 
-Future<TestResponse> refresh(
-    String clientID, String clientSecret, Map<String, String> form) {
-  Agent client = Agent.onPort(8888)
-    ..setBasicAuthorization(clientID, clientSecret);
+Future<TestResponse> refresh(String clientID, String clientSecret, Map<String, String> form) {
+  Agent client = Agent.onPort(8888)..setBasicAuthorization(clientID, clientSecret);
 
   final m = Map<String, String>.from(form);
   m.addAll({"grant_type": "refresh_token"});
@@ -787,10 +702,8 @@ Future<TestResponse> refresh(
   return req.post();
 }
 
-Future<TestResponse> exchange(
-    String clientID, String clientSecret, String code) {
-  Agent client = Agent.onPort(8888)
-    ..setBasicAuthorization(clientID, clientSecret);
+Future<TestResponse> exchange(String clientID, String clientSecret, String code) {
+  Agent client = Agent.onPort(8888)..setBasicAuthorization(clientID, clientSecret);
 
   var m = {"grant_type": "authorization_code"};
 

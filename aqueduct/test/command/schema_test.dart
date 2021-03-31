@@ -1,6 +1,6 @@
 // ignore: unnecessary_const
 @Tags(const ["cli"])
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
@@ -14,7 +14,7 @@ void main() {
     cli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();
     await cli.agent.getDependencies(offline: true);
     cli.agent.addOrReplaceFile("lib/application_test.dart", """
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 
 class TestObject extends ManagedObject<_TestObject> {}
 

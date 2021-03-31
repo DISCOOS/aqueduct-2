@@ -3,12 +3,26 @@ description: An Aqueduct application with a database connection and data model.
 version: 0.0.1
 author: stable|kernel <jobs@stablekernel.com>
 
+# Not intended for publishing
+publish_to: none
+
 environment:
   sdk: ">=2.0.0 <3.0.0"
 
 dependencies:
-  aqueduct: ^4.0.0-b1
+  aqueduct_2: ^1.0.0
+
+dependency_overrides:
+  aqueduct_2:
+    path: ../..
+  safe_config_2:
+    git: https://github.com/DISCOOS/safe-config-2.git
+  runtime_2:
+    git: https://github.com/DISCOOS/dart-runtime-2.git
+  isolate_executor_2:
+    git: https://github.com/DISCOOS/dart-isolate-executor-2.git
 
 dev_dependencies:
   test: ^1.0.0
-  aqueduct_test: ^2.0.0-b1
+  aqueduct_test:
+    path: ../../../aqueduct_test

@@ -1,12 +1,12 @@
 import 'dart:mirrors';
 
-import 'package:aqueduct/src/runtime/orm/data_model_compiler.dart';
-import 'package:aqueduct/src/runtime/orm/entity_builder.dart';
-import 'package:aqueduct/src/runtime/orm/validator_builder.dart';
-import 'package:aqueduct/src/runtime/orm/entity_mirrors.dart';
-import 'package:aqueduct/src/db/managed/managed.dart';
-import 'package:aqueduct/src/db/managed/relationship_type.dart';
-import 'package:aqueduct/src/utilities/mirror_helpers.dart';
+import 'package:aqueduct_2/src/runtime/orm/data_model_compiler.dart';
+import 'package:aqueduct_2/src/runtime/orm/entity_builder.dart';
+import 'package:aqueduct_2/src/runtime/orm/validator_builder.dart';
+import 'package:aqueduct_2/src/runtime/orm/entity_mirrors.dart';
+import 'package:aqueduct_2/src/db/managed/managed.dart';
+import 'package:aqueduct_2/src/db/managed/relationship_type.dart';
+import 'package:aqueduct_2/src/utilities/mirror_helpers.dart';
 
 class PropertyBuilder {
   PropertyBuilder(this.parent, this.declaration)
@@ -16,23 +16,18 @@ class PropertyBuilder {
     name = _getName();
     type = _getType();
 
-
     /* this collection of validators via 1. Validate metadata 2. Column metadata 3. implicit enum
     * is replicated in the generated code. if more implicit validators are created, a more general
     * purpose solution should be created
     * */
-    _validators = validatorsFromDeclaration(declaration)
-        .map((v) => ValidatorBuilder(this, v))
-        .toList();
+    _validators = validatorsFromDeclaration(declaration).map((v) => ValidatorBuilder(this, v)).toList();
 
     if (column?.validators?.isNotEmpty ?? false) {
-      _validators
-          .addAll(column.validators.map((v) => ValidatorBuilder(this, v)));
+      _validators.addAll(column.validators.map((v) => ValidatorBuilder(this, v)));
     }
 
     if (type?.isEnumerated ?? false) {
-      _validators.add(ValidatorBuilder(
-          this, Validate.oneOf(type.enumerationMap.values.toList())));
+      _validators.add(ValidatorBuilder(this, Validate.oneOf(type.enumerationMap.values.toList())));
     }
   }
 
@@ -67,16 +62,14 @@ class PropertyBuilder {
   void compile(List<EntityBuilder> entityBuilders) {
     if (type == null) {
       if (relate != null) {
-        relatedProperty =
-            _getRelatedEntityBuilderFrom(entityBuilders).getInverseOf(this);
+        relatedProperty = _getRelatedEntityBuilderFrom(entityBuilders).getInverseOf(this);
         type = relatedProperty.parent.primaryKeyProperty.type;
         relationshipType = ManagedRelationshipType.belongsTo;
         includeInDefaultResultSet = true;
         deleteRule = relate.onDelete;
         nullable = !relate.isRequired;
         relatedProperty.setInverse(this);
-        unique =
-            relatedProperty?.relationshipType == ManagedRelationshipType.hasOne;
+        unique = relatedProperty?.relationshipType == ManagedRelationshipType.hasOne;
       }
     } else {
       primaryKey = column?.isPrimaryKey ?? false;
@@ -93,37 +86,28 @@ class PropertyBuilder {
 
   void validate(List<EntityBuilder> entityBuilders) {
     if (type == null) {
-      if (!isRelationship ||
-          relationshipType == ManagedRelationshipType.belongsTo) {
-        throw ManagedDataModelErrorImpl.invalidType(
-            declaration.owner.simpleName, declaration.simpleName);
+      if (!isRelationship || relationshipType == ManagedRelationshipType.belongsTo) {
+        throw ManagedDataModelErrorImpl.invalidType(declaration.owner.simpleName, declaration.simpleName);
       }
     }
 
     if (isRelationship) {
       if (column != null) {
-        throw ManagedDataModelErrorImpl.invalidMetadata(
-            parent.tableDefinitionTypeName, declaration.simpleName);
+        throw ManagedDataModelErrorImpl.invalidMetadata(parent.tableDefinitionTypeName, declaration.simpleName);
       }
       if (relate != null && relatedProperty.relate != null) {
-        throw ManagedDataModelErrorImpl.dualMetadata(
-            parent.tableDefinitionTypeName,
-            declaration.simpleName,
-            relatedProperty.parent.tableDefinitionTypeName,
-            relatedProperty.name);
+        throw ManagedDataModelErrorImpl.dualMetadata(parent.tableDefinitionTypeName, declaration.simpleName,
+            relatedProperty.parent.tableDefinitionTypeName, relatedProperty.name);
       }
     } else {
       if (defaultValue != null && autoincrement) {
-        throw ManagedDataModelError(
-            "Property '${parent.name}.$name' is invalid. "
+        throw ManagedDataModelError("Property '${parent.name}.$name' is invalid. "
             "A property cannot have a default value and be autoincrementing. ");
       }
     }
 
-    if (relate?.onDelete == DeleteRule.nullify &&
-        (relate?.isRequired ?? false)) {
-      throw ManagedDataModelErrorImpl.incompatibleDeleteRule(
-          parent.tableDefinitionTypeName, declaration.simpleName);
+    if (relate?.onDelete == DeleteRule.nullify && (relate?.isRequired ?? false)) {
+      throw ManagedDataModelErrorImpl.incompatibleDeleteRule(parent.tableDefinitionTypeName, declaration.simpleName);
     }
 
     validators.forEach((vb) => vb.validate(entityBuilders));
@@ -132,20 +116,11 @@ class PropertyBuilder {
   void link(List<ManagedEntity> others) {
     validators.forEach((v) => v.link(others));
     if (isRelationship) {
-      var destinationEntity =
-          others.firstWhere((e) => e == relatedProperty.parent.entity);
+      var destinationEntity = others.firstWhere((e) => e == relatedProperty.parent.entity);
 
-      final dartType =
-          ((declaration as VariableMirror).type as ClassMirror).reflectedType;
+      final dartType = ((declaration as VariableMirror).type as ClassMirror).reflectedType;
       relationship = ManagedRelationshipDescription(
-          parent.entity,
-          name,
-          type,
-          dartType,
-          destinationEntity,
-          deleteRule,
-          relationshipType,
-          relatedProperty.name,
+          parent.entity, name, type, dartType, destinationEntity, deleteRule, relationshipType, relatedProperty.name,
           unique: unique,
           indexed: true,
           nullable: nullable,
@@ -153,8 +128,7 @@ class PropertyBuilder {
           validators: validators.map((v) => v.managedValidator).toList());
     } else {
       final dartType = getDeclarationType().reflectedType;
-      attribute = ManagedAttributeDescription(parent.entity, name, type,
-          dartType,
+      attribute = ManagedAttributeDescription(parent.entity, name, type, dartType,
           primaryKey: primaryKey,
           transientStatus: serialize,
           defaultValue: defaultValue,
@@ -192,8 +166,7 @@ class PropertyBuilder {
     }
 
     if (type is! ClassMirror) {
-      throw ManagedDataModelError(
-          "Invalid type for field '${MirrorSystem.getName(declaration.simpleName)}' "
+      throw ManagedDataModelError("Invalid type for field '${MirrorSystem.getName(declaration.simpleName)}' "
           "in table definition '${parent.tableDefinitionTypeName}'.");
     }
 
@@ -204,8 +177,7 @@ class PropertyBuilder {
     final declType = getDeclarationType();
     try {
       if (column?.databaseType != null) {
-        return ManagedType(
-            declType.reflectedType, column.databaseType, null, null);
+        return ManagedType(declType.reflectedType, column.databaseType, null, null);
       }
 
       return getManagedTypeFromType(declType);
@@ -226,20 +198,16 @@ class PropertyBuilder {
       return MirrorSystem.getName(declaration.simpleName);
     }
 
-    throw ManagedDataModelError(
-        "Tried getting property type description from non-property. This is an internal error, "
+    throw ManagedDataModelError("Tried getting property type description from non-property. This is an internal error, "
         "as this method shouldn't be invoked on non-property or non-accessors.");
   }
 
   EntityBuilder _getRelatedEntityBuilderFrom(List<EntityBuilder> builders) {
     final expectedInstanceType = getDeclarationType();
     if (!relate.isDeferred) {
-      return builders.firstWhere((b) => b.instanceType == expectedInstanceType,
-          orElse: () {
+      return builders.firstWhere((b) => b.instanceType == expectedInstanceType, orElse: () {
         throw ManagedDataModelErrorImpl.noDestinationEntity(
-            parent.tableDefinitionTypeName,
-            declaration.simpleName,
-            expectedInstanceType.simpleName);
+            parent.tableDefinitionTypeName, declaration.simpleName, expectedInstanceType.simpleName);
       });
     }
 
@@ -258,9 +226,7 @@ class PropertyBuilder {
     }
 
     throw ManagedDataModelErrorImpl.noDestinationEntity(
-        parent.tableDefinitionTypeName,
-        declaration.simpleName,
-        expectedInstanceType.simpleName);
+        parent.tableDefinitionTypeName, declaration.simpleName, expectedInstanceType.simpleName);
   }
 
   static Serialize _getTransienceForProperty(DeclarationMirror declaration) {

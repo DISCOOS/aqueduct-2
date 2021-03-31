@@ -13,13 +13,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 /// The core libraries of the Aqueduct framework.
 ///
-/// See documentation guides at https://aqueduct.io/docs/.
-library aqueduct;
+/// See documentation guides at https://discoos.github.io/aqueduct-2/docs/.
+library aqueduct_2;
 
 export 'package:logging/logging.dart';
-export 'package:safe_config/safe_config.dart';
-
-export 'package:aqueduct/src/runtime/compiler.dart';
+export 'package:safe_config_2/safe_config_2.dart';
 
 export 'src/application/application.dart';
 export 'src/auth/auth.dart';
@@ -27,5 +25,4 @@ export 'src/db/db.dart';
 export 'src/db/managed/relationship_type.dart';
 export 'src/http/http.dart';
 export 'src/openapi/openapi.dart';
-
-
+export 'src/runtime/compiler.dart';

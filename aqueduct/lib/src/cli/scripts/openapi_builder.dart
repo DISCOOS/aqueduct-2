@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:aqueduct/aqueduct.dart';
-import 'package:aqueduct/src/cli/command.dart';
-import 'package:aqueduct/src/cli/mixins/openapi_options.dart';
-import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:isolate_executor/isolate_executor.dart';
-import 'package:runtime/runtime.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
+import 'package:aqueduct_2/src/cli/command.dart';
+import 'package:aqueduct_2/src/cli/mixins/openapi_options.dart';
+import 'package:aqueduct_2/src/cli/mixins/project.dart';
+import 'package:isolate_executor_2/isolate_executor_2.dart';
+import 'package:runtime_2/runtime_2.dart';
 import 'package:yaml/yaml.dart';
 
 class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
@@ -15,22 +15,14 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
         title = message["title"] as String,
         description = message["description"] as String,
         version = message["version"] as String,
-        termsOfServiceURL = message["termsOfServiceURL"] != null
-            ? Uri.parse(message["termsOfServiceURL"] as String)
-            : null,
+        termsOfServiceURL =
+            message["termsOfServiceURL"] != null ? Uri.parse(message["termsOfServiceURL"] as String) : null,
         contactEmail = message["contactEmail"] as String,
         contactName = message["contactName"] as String,
-        contactURL = message["contactURL"] != null
-            ? Uri.parse(message["contactURL"] as String)
-            : null,
-        licenseURL = message["licenseURL"] != null
-            ? Uri.parse(message["licenseURL"] as String)
-            : null,
+        contactURL = message["contactURL"] != null ? Uri.parse(message["contactURL"] as String) : null,
+        licenseURL = message["licenseURL"] != null ? Uri.parse(message["licenseURL"] as String) : null,
         licenseName = message["licenseName"] as String,
-        hosts = (message["hosts"] as List<String>)
-                ?.map((uri) => APIServerDescription(Uri.parse(uri)))
-                ?.toList() ??
-            [],
+        hosts = (message["hosts"] as List<String>)?.map((uri) => APIServerDescription(Uri.parse(uri)))?.toList() ?? [],
         resolveRelativeUrls = message["resolveRelativeUrls"] as bool,
         super(message);
 
@@ -52,8 +44,7 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
 
   @override
   Future<Map<String, dynamic>> execute() async {
-    final channels =
-        RuntimeContext.current.runtimes.iterable.whereType<ChannelRuntime>();
+    final channels = RuntimeContext.current.runtimes.iterable.whereType<ChannelRuntime>();
     if (channels.length != 1) {
       throw StateError(
           "Zero or more than one ApplicationChannel subclass found: ${channels.map((c) => "'${c.channelType}'").join(", ")}");
@@ -62,11 +53,9 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
     try {
       var config = ApplicationOptions()..configurationFilePath = configPath;
 
-      final yaml = (loadYaml(pubspecContents) as Map<dynamic, dynamic>)
-          .cast<String, dynamic>();
+      final yaml = (loadYaml(pubspecContents) as Map<dynamic, dynamic>).cast<String, dynamic>();
 
-      var document =
-          await Application.document(channels.first.channelType, config, yaml);
+      var document = await Application.document(channels.first.channelType, config, yaml);
 
       document.servers = hosts;
       if (title != null) {
@@ -112,15 +101,13 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
       }
 
       if (resolveRelativeUrls) {
-        final baseUri =
-            document.servers?.first?.url ?? Uri.parse("http://localhost:8888");
+        final baseUri = document.servers?.first?.url ?? Uri.parse("http://localhost:8888");
         document.components.securitySchemes.values?.forEach((scheme) {
           scheme.flows?.values?.forEach((flow) {
             if (flow.refreshURL != null && !flow.refreshURL.isAbsolute) {
               flow.refreshURL = baseUri.resolveUri(flow.refreshURL);
             }
-            if (flow.authorizationURL != null &&
-                !flow.authorizationURL.isAbsolute) {
+            if (flow.authorizationURL != null && !flow.authorizationURL.isAbsolute) {
               flow.authorizationURL = baseUri.resolveUri(flow.authorizationURL);
             }
             if (flow.tokenURL != null && !flow.tokenURL.isAbsolute) {
@@ -132,29 +119,23 @@ class OpenAPIBuilder extends Executable<Map<String, dynamic>> {
 
       return document.asMap();
     } on ConfigurationException catch (e) {
-      return {
-        "error":
-            "There was an issue loading the configuration file '${configPath}': ${e.message}"
-      };
+      return {"error": "There was an issue loading the configuration file '${configPath}': ${e.message}"};
     } on ManagedDataModelError catch (e) {
-      return {
-        "error": "There was an issue compiling a data model: ${e.message}"
-      };
+      return {"error": "There was an issue compiling a data model: ${e.message}"};
     }
   }
 
   static List<String> importsForPackage(String packageName) => [
-        "package:aqueduct/aqueduct.dart",
+        "package:aqueduct_2/aqueduct_2.dart",
         "package:$packageName/$packageName.dart",
         "package:yaml/yaml.dart",
         "dart:convert",
         "dart:io",
-        "package:runtime/runtime.dart"
+        "package:runtime_2/runtime_2.dart"
       ];
 }
 
-Future<Map<String, dynamic>> documentProject(
-    CLIProject project, CLIDocumentOptions options) async {
+Future<Map<String, dynamic>> documentProject(CLIProject project, CLIDocumentOptions options) async {
   final variables = <String, dynamic>{
     "pubspec": project.projectSpecificationFile.readAsStringSync(),
     "hosts": options.hosts?.map((u) => u.toString())?.toList(),
@@ -172,8 +153,7 @@ Future<Map<String, dynamic>> documentProject(
   };
 
   final result = await IsolateExecutor.run(OpenAPIBuilder(variables),
-      packageConfigURI: project.packageConfigUri,
-      imports: OpenAPIBuilder.importsForPackage(project.libraryName));
+      packageConfigURI: project.packageConfigUri, imports: OpenAPIBuilder.importsForPackage(project.libraryName));
 
   if (result.containsKey("error")) {
     throw CLIException(result["error"] as String);

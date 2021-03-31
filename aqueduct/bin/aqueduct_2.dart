@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:aqueduct/src/cli/runner.dart';
+import 'package:aqueduct_2/src/cli/runner.dart';
 
 Future main(List<String> args) async {
   final runner = Runner();

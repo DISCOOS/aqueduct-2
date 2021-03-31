@@ -1,7 +1,7 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
-import 'package:aqueduct/src/dev/context_helpers.dart';
+import 'package:aqueduct_2/src/dev/context_helpers.dart';
 
 void main() {
   ManagedContext ctx;
@@ -12,9 +12,7 @@ void main() {
     await ctx.close();
   });
 
-  test(
-      "If context does not contain data model with query type, throw exception",
-      () {
+  test("If context does not contain data model with query type, throw exception", () {
     try {
       Query<Missing>(ctx);
       fail('unreachable');
@@ -23,9 +21,7 @@ void main() {
     }
   });
 
-  test(
-      "Can immediately access primary key of belongs-to relationship when building Query.values",
-      () {
+  test("Can immediately access primary key of belongs-to relationship when building Query.values", () {
     final q = Query<Child>(ctx);
     q.values.parent.id = 1;
     expect(q.values.parent.id, 1);
@@ -38,9 +34,7 @@ void main() {
 
   test("Cannot join on same property twice", () {
     try {
-      Query<Root>(ctx)
-        ..join(object: (r) => r.child)
-        ..join(object: (r) => r.child);
+      Query<Root>(ctx)..join(object: (r) => r.child)..join(object: (r) => r.child);
       fail('unreachable');
     } on StateError catch (e) {
       expect(e.toString(), contains("Invalid query"));
@@ -80,9 +74,7 @@ void main() {
     }
   });
 
-  test(
-      "Accessing non-primary key of ManagedObject property in Query.values throws error",
-      () {
+  test("Accessing non-primary key of ManagedObject property in Query.values throws error", () {
     final q = Query<Child>(ctx);
     try {
       q.values.parent.name = "ok";
@@ -92,8 +84,7 @@ void main() {
     }
   });
 
-  test("Accessing primary key of has-one property in Query.values throws error",
-      () {
+  test("Accessing primary key of has-one property in Query.values throws error", () {
     final q = Query<Root>(ctx);
     try {
       q.values.child.id = 1;
@@ -103,26 +94,20 @@ void main() {
     }
   });
 
-  test(
-      "Can set belongs-to relationship with default constructed object if it is empty",
-      () {
+  test("Can set belongs-to relationship with default constructed object if it is empty", () {
     final q = Query<Child>(ctx);
     q.values.parent = Root();
     q.values.parent.id = 1;
     expect(q.values.parent.id, 1);
   });
 
-  test(
-      "Can set belongs-to relationship with default constructed object if it only contains primary key",
-      () {
+  test("Can set belongs-to relationship with default constructed object if it only contains primary key", () {
     final q = Query<Child>(ctx);
     q.values.parent = Root()..id = 1;
     expect(q.values.parent.id, 1);
   });
 
-  test(
-      "Setting belongs-to relationship with default constructed object removes non-primary key values",
-      () {
+  test("Setting belongs-to relationship with default constructed object removes non-primary key values", () {
     final q = Query<Child>(ctx);
     q.values.parent = Root()
       ..id = 1
@@ -170,18 +155,14 @@ void main() {
       expect(q.values.backing.contents, {});
     });
 
-    test(
-        "If default instance holds belongs-to ManagedObject with more than primary key, remove inner key",
-        () {
+    test("If default instance holds belongs-to ManagedObject with more than primary key, remove inner key", () {
       final q = Query<Child>(ctx);
       q.values = Child()..parent = (Root()..name = "fred");
       expect(q.values.backing.contents.keys, ["parent"]);
       expect(q.values.backing.contents["parent"].backing.contents, {});
     });
 
-    test(
-        "If default instance holds belongs-to ManagedObject with only primary key, retain value",
-        () {
+    test("If default instance holds belongs-to ManagedObject with only primary key, retain value", () {
       final q = Query<Child>(ctx);
       final r = Child()..parent = (Root()..id = 1);
 
@@ -190,9 +171,7 @@ void main() {
       expect(q.values.parent.id, 1);
     });
 
-    test(
-        "If multiple values are set on assigned object, only remove those that need to be removed",
-        () {
+    test("If multiple values are set on assigned object, only remove those that need to be removed", () {
       final q = Query<Child>(ctx);
       q.values = Child()
         ..parent = (Root()

@@ -1,4 +1,4 @@
-import 'package:aqueduct/src/db/db.dart';
+import 'package:aqueduct_2/src/db/db.dart';
 import 'package:test/test.dart';
 
 void main() {

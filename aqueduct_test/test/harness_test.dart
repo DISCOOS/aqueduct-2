@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:aqueduct_test/aqueduct_test.dart';
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -27,25 +27,20 @@ void main() {
       expect(harness.channel.options.context, {"key": "value"});
     });
 
-    test(
-        "Can start app in test mode and make a request to it with defaultClient",
-        () async {
+    test("Can start app in test mode and make a request to it with defaultClient", () async {
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
-          body: {"key": "value"});
+      expectResponse(await harness.agent.request("endpoint").get(), 200, body: {"key": "value"});
       expect(harness.application.isRunning, true);
     });
 
     test("Can stop and restart an application", () async {
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
-          body: {"key": "value"});
+      expectResponse(await harness.agent.request("endpoint").get(), 200, body: {"key": "value"});
       expect(harness.application.isRunning, true);
       await harness.stop();
       expect(harness.application, isNull);
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
-          body: {"key": "value"});
+      expectResponse(await harness.agent.request("endpoint").get(), 200, body: {"key": "value"});
       expect(harness.application.isRunning, true);
     });
   });
@@ -65,7 +60,6 @@ void main() {
       expect(harness.events.last.last, true);
       expect(harness.setupCount, 2);
       expect(harness.tearDownCount, 1);
-
     });
 
     test("agent is set prior to afterStart running", () async {
@@ -78,9 +72,7 @@ class Channel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-    router
-        .route("/endpoint")
-        .linkFunction((req) async => Response.ok({"key": "value"}));
+    router.route("/endpoint").linkFunction((req) async => Response.ok({"key": "value"}));
     return router;
   }
 }
@@ -105,13 +97,11 @@ class HarnessSubclass extends TestHarness<Channel> {
 
   @override
   Future onSetUp() async {
-    setupCount ++;
+    setupCount++;
   }
 
   @override
   Future onTearDown() async {
-    tearDownCount ++;
+    tearDownCount++;
   }
-
-
 }

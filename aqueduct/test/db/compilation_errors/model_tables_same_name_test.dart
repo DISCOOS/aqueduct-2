@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:aqueduct_2/aqueduct_2.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -20,7 +20,7 @@ class _SameNameOne {
   @primaryKey
   int id;
 
-  static String tableName() => "fo";
+  static String tableName() => "fo"; // ignore: unused_element
 }
 
 class SameNameTwo extends ManagedObject<_SameNameTwo> {}
@@ -29,5 +29,5 @@ class _SameNameTwo {
   @primaryKey
   int id;
 
-  static String tableName() => "fo";
+  static String tableName() => "fo"; // ignore: unused_element
 }
