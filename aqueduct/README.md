@@ -7,6 +7,7 @@ This is a [fork](https://github.com/DISCOOS/aqueduct-2) maintained by [DISCO Ope
 ### Aqueduct 2
 
 ![Aqueduct](https://s3.amazonaws.com/aqueduct-collateral/aqueduct.png)
+
 [![Build Status](https://www.travis-ci.com/DISCOOS/aqueduct-2.svg?branch=master)](https://www.travis-ci.com/DISCOOS/aqueduct-2)
 [![codecov](https://codecov.io/gh/DISCOOS/aqueduct-2/branch/master/graph/badge.svg?token=YY5JSM27KX)](https://codecov.io/gh/DISCOOS/aqueduct-2)
 
