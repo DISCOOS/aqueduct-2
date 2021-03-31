@@ -153,7 +153,14 @@ void main() {
 
       expect(successResponse.statusCode, 200);
 
-      expect(outageResponseFuture.timeout(const Duration(milliseconds: 100)), completes);
+      expect(
+        outageResponseFuture.timeout(
+          const Duration(milliseconds: 100),
+          // ignore: missing_return
+          onTimeout: () {},
+        ),
+        completes,
+      );
     });
 
     test("Can provide multiple outages", () async {
