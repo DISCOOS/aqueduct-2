@@ -25,6 +25,8 @@ class _TestObject {
   String foo;
 }
       """);
+
+    return null;
   });
 
   tearDown(ProjectAgent.tearDownAll);

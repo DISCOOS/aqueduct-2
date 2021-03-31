@@ -73,7 +73,7 @@ class CLIClient {
   Future<CLIClient> createProject({String name = "application_test", String template, bool offline = true}) async {
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
-        "aqueduct": {"path": "../.."}
+        "aqueduct_2": {"path": "../.."}
       }, devDependencies: {
         "test": "^1.0.0"
       }));
