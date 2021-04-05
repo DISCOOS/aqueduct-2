@@ -17,4 +17,16 @@ dependencies:
 dependency_overrides:
   aqueduct_2:
     path: ../aqueduct
+  safe_config_2:
+    git:
+      url: https://github.com/DISCOOS/safe-config-2.git
+      ref: master
+  runtime_2:
+    git:
+      url: https://github.com/DISCOOS/dart-runtime-2.git
+      ref: master
+  isolate_executor_2:
+    git:
+      url: https://github.com/DISCOOS/dart-isolate-executor-2
+      ref: master
 

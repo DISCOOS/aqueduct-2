@@ -26,7 +26,7 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
   @override
   Future<int> handle() async {
     if (projectName == null) {
-      printHelp(parentCommandName: "aqueduct");
+      printHelp(parentCommandName: "aqueduct_2");
       return 1;
     }
 
@@ -297,7 +297,7 @@ class CLIAqueductGlobal {
   PubCache pub = PubCache();
 
   PackageRef get aqueductPackageRef {
-    return pub.getGlobalApplications().firstWhere((app) => app.name == "aqueduct").getDefiningPackageRef();
+    return pub.getGlobalApplications().firstWhere((app) => app.name == "aqueduct_2").getDefiningPackageRef();
   }
 
   Uri get templateDirectory {

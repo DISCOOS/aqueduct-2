@@ -19,7 +19,7 @@ class CLIDatabaseUpgrade extends CLICommand with CLIDatabaseConnectingCommand, C
 
     if (migrations.isEmpty) {
       displayInfo("No migration files.");
-      displayProgress("Run 'aqueduct db generate' first.");
+      displayProgress("Run 'aqueduct_2 db generate' first.");
       return 0;
     }
 

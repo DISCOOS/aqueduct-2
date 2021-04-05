@@ -20,6 +20,8 @@ dependencies:
   path: ^1.6.1
   postgres: ^2.1.1
   pub_cache: ^0.2.3
+
+dependency_overrides:
   safe_config_2:
     git:
       url: https://github.com/DISCOOS/safe-config-2.git

@@ -118,7 +118,7 @@ class CLIAuthAddClient extends CLICommand with CLIDatabaseConnectingCommand, CLI
 
   @override
   String get description {
-    return "Adds an OAuth 2.0 client to a database when the database has been provisioned with the aqueduct/managed_auth package.";
+    return "Adds an OAuth 2.0 client to a database when the database has been provisioned with the aqueduct_2/managed_auth package.";
   }
 }
 

@@ -29,7 +29,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   @Option("database-config",
       help: "A configuration file that provides connection information for the database. "
           "Paths are relative to project directory. If the connect option is set, this value is ignored. "
-          "See 'aqueduct db -h' for details.",
+          "See 'aqueduct_2 db -h' for details.",
       defaultsTo: "database.yaml")
   File get databaseConfigurationFile => fileInProjectDirectory(decode("database-config"));
 

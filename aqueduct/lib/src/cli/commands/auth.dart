@@ -12,7 +12,7 @@ class CLIAuth extends CLICommand {
 
   @override
   Future<int> handle() async {
-    printHelp(parentCommandName: "aqueduct");
+    printHelp(parentCommandName: "aqueduct_2");
     return 0;
   }
 

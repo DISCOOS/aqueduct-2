@@ -69,6 +69,6 @@ class CLIAuthScopeClient extends CLICommand with CLIDatabaseConnectingCommand, C
 
   @override
   String get description {
-    return "Sets the scope of an existing OAuth 2.0 client in a database that has been provisioned with the aqueduct/managed_auth package.";
+    return "Sets the scope of an existing OAuth 2.0 client in a database that has been provisioned with the aqueduct_2/managed_auth package.";
   }
 }

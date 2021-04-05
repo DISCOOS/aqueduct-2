@@ -45,6 +45,7 @@ Future main(List<String> args) async {
       Directory.current.uri.resolve("run"),
       f.readAsStringSync(),
       forTests: true,
+      offline: false,
     );
     final bm = BuildManager(ctx);
     await bm.build();
@@ -53,8 +54,9 @@ Future main(List<String> args) async {
     final result = await Process.start("dart", ["test/main_test.dart"],
         workingDirectory: ctx.buildDirectoryUri.toFilePath(windows: Platform.isWindows),
         environment: {
-          'AQUEDUCT_CI_DIR_LOCATION':
-              Directory.current.uri.resolve("../").resolve("ci/").toFilePath(windows: Platform.isWindows)
+          'AQUEDUCT_CI_DIR_LOCATION': Directory.current.uri.resolve("../").resolve("ci/").toFilePath(
+                windows: Platform.isWindows,
+              )
         });
     // ignore: unawaited_futures
     stdout.addStream(result.stdout);
@@ -65,6 +67,7 @@ Future main(List<String> args) async {
       exitCode = -1;
       failingFiles.add(f);
       print("Tests FAILED in ${f.path}.");
+      exit(exitCode);
     } else {
       passingFiles.add(f);
     }

@@ -53,7 +53,7 @@ abstract class CLIProject implements CLICommand {
       }
 
       final lockFileContents = loadYaml(lockFile.readAsStringSync()) as Map;
-      final projectVersion = lockFileContents["packages"]["aqueduct"]["version"] as String;
+      final projectVersion = lockFileContents["packages"]["aqueduct_2"]["version"] as String;
       _projectVersion = Version.parse(projectVersion);
     }
 
